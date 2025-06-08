@@ -609,54 +609,6 @@
             }
         }
         
-        /* Section Card */
-        .section-card {
-            background: var(--white);
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px var(--shadow);
-        }
-        
-        .section-card h2 {
-            margin-bottom: 1.5rem;
-            color: var(--dark-gray);
-        }
-        
-        /* Association Card */
-        .association-card {
-            border: 1px solid var(--light-gray);
-            padding: 1.5rem;
-            border-radius: 10px;
-            margin-bottom: 1rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .association-info h3 {
-            margin-bottom: 0.5rem;
-        }
-        
-        .association-info p {
-            color: var(--medium-gray);
-            font-size: 0.875rem;
-            margin-bottom: 0.25rem;
-        }
-        
-        .association-actions {
-            display: flex;
-            gap: 0.5rem;
-        }
-        
-        /* QR Code Container */
-        #myQRCode {
-            display: inline-block;
-            padding: 2rem;
-            background: white;
-            border: 2px solid var(--primary-orange);
-            border-radius: 10px;
-        }
-        
         /* Loading */
         .loading {
             display: flex;
@@ -804,163 +756,141 @@
             
             <!-- Content -->
             <div class="content">
-                <!-- Admin Content -->
-                <div id="adminContent" style="display: none;">
-                    <!-- Stats Cards -->
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-icon orange">🏢</div>
-                            <div class="stat-info">
-                                <h3>Associações Ativas</h3>
-                                <div class="stat-value" id="activeAssociationsCount">0</div>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon green">👥</div>
-                            <div class="stat-info">
-                                <h3>Total de Guardadores</h3>
-                                <div class="stat-value" id="totalGuardsCount">0</div>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon blue">🚗</div>
-                            <div class="stat-info">
-                                <h3>Vagas Ativas Agora</h3>
-                                <div class="stat-value" id="activeSpotsCount">0</div>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon yellow">💰</div>
-                            <div class="stat-info">
-                                <h3>Faturamento Hoje</h3>
-                                <div class="stat-value" id="todayRevenue">R$ 0,00</div>
-                            </div>
+                <!-- Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon orange">👥</div>
+                        <div class="stat-info">
+                            <h3>Guardadores Ativos</h3>
+                            <div class="stat-value" id="activeGuardsCount">0</div>
                         </div>
                     </div>
-                    
-                    <!-- Pending Associations -->
-                    <div class="section-card" style="margin-top: 2rem;">
-                        <h2>Associações Pendentes de Aprovação</h2>
-                        <div id="pendingAssociations">
-                            <div class="loading">
-                                <div class="spinner"></div>
-                            </div>
+                    <div class="stat-card">
+                        <div class="stat-icon green">🚗</div>
+                        <div class="stat-info">
+                            <h3>Vagas Ativas Agora</h3>
+                            <div class="stat-value" id="activeSpotsCount">0</div>
                         </div>
                     </div>
-                    
-                    <!-- Active Associations -->
-                    <div class="section-card" style="margin-top: 2rem;">
-                        <h2>Associações Ativas</h2>
-                        <div id="activeAssociations">
-                            <div class="loading">
-                                <div class="spinner"></div>
-                            </div>
+                    <div class="stat-card">
+                        <div class="stat-icon blue">💰</div>
+                        <div class="stat-info">
+                            <h3>Faturamento Hoje</h3>
+                            <div class="stat-value" id="todayRevenue">R$ 0,00</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon yellow">⭐</div>
+                        <div class="stat-info">
+                            <h3>Avaliação Média</h3>
+                            <div class="stat-value" id="avgRating">4.8</div>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Association Content -->
-                <div id="associationContent" style="display: none;">
-                    <!-- Stats Cards -->
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-icon orange">👥</div>
-                            <div class="stat-info">
-                                <h3>Meus Guardadores</h3>
-                                <div class="stat-value" id="myGuardsCount">0</div>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon green">🚗</div>
-                            <div class="stat-info">
-                                <h3>Vagas Ativas</h3>
-                                <div class="stat-value" id="myActiveSpotsCount">0</div>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon blue">💰</div>
-                            <div class="stat-info">
-                                <h3>Faturamento Hoje</h3>
-                                <div class="stat-value" id="myTodayRevenue">R$ 0,00</div>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon yellow">⭐</div>
-                            <div class="stat-info">
-                                <h3>Avaliação Média</h3>
-                                <div class="stat-value" id="myAvgRating">4.8</div>
-                            </div>
+                <!-- Filters Section -->
+                <div class="filters-section">
+                    <div class="filters-header">
+                        <h2>Filtros</h2>
+                        <div class="view-toggle">
+                            <button class="view-btn active" onclick="switchView('map')">🗺️ Mapa</button>
+                            <button class="view-btn" onclick="switchView('cards')">📇 Cards</button>
+                            <button class="view-btn" onclick="switchView('table')">📋 Tabela</button>
                         </div>
                     </div>
-                    
-                    <!-- Add Guard Form -->
-                    <div class="section-card" style="margin-top: 2rem;">
-                        <h2>Cadastrar Novo Guardador</h2>
-                        <form id="addGuardForm" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
-                            <input type="text" placeholder="Nome completo" required>
-                            <input type="text" placeholder="CPF" required>
-                            <input type="tel" placeholder="WhatsApp" required>
-                            <input type="text" placeholder="Área de atuação" required>
-                            <input type="email" placeholder="Email (opcional)">
-                            <input type="text" placeholder="Chave PIX" required>
-                            <button type="submit" class="btn btn-primary">Cadastrar Guardador</button>
-                        </form>
-                    </div>
-                    
-                    <!-- My Guards List -->
-                    <div class="section-card" style="margin-top: 2rem;">
-                        <h2>Meus Guardadores</h2>
-                        <div id="myGuardsList">
-                            <div class="loading">
-                                <div class="spinner"></div>
-                            </div>
+                    <div class="filters-grid">
+                        <div class="filter-group">
+                            <label>Status</label>
+                            <select id="statusFilter">
+                                <option value="">Todos</option>
+                                <option value="active">Disponível</option>
+                                <option value="busy">Ocupado</option>
+                                <option value="offline">Offline</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Área/Região</label>
+                            <select id="areaFilter">
+                                <option value="">Todas</option>
+                                <option value="centro">Centro</option>
+                                <option value="norte">Zona Norte</option>
+                                <option value="sul">Zona Sul</option>
+                                <option value="leste">Zona Leste</option>
+                                <option value="oeste">Zona Oeste</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Avaliação Mínima</label>
+                            <select id="ratingFilter">
+                                <option value="">Qualquer</option>
+                                <option value="5">⭐⭐⭐⭐⭐ 5.0</option>
+                                <option value="4">⭐⭐⭐⭐ 4.0+</option>
+                                <option value="3">⭐⭐⭐ 3.0+</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Associação</label>
+                            <select id="associationFilter">
+                                <option value="">Todas</option>
+                            </select>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Guard Content -->
-                <div id="guardContent" style="display: none;">
-                    <!-- My QR Code -->
-                    <div class="section-card">
-                        <h2>Meu QR Code</h2>
-                        <div style="text-align: center; padding: 2rem;">
-                            <div id="myQRCode"></div>
-                            <p style="margin-top: 1rem;">Mostre este QR Code para os clientes</p>
-                            <button class="btn btn-primary" onclick="printQRCode()">Imprimir QR Code</button>
+                <!-- Map View -->
+                <div id="mapView" class="map-container">
+                    <div id="map"></div>
+                    <div class="map-legend">
+                        <h4>Legenda</h4>
+                        <div class="legend-item">
+                            <div class="legend-marker" style="background: #4CAF50;"></div>
+                            <span>Disponível</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-marker" style="background: #FFC107;"></div>
+                            <span>Ocupado</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-marker" style="background: #F44336;"></div>
+                            <span>Offline</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-marker" style="background: #2196F3;"></div>
+                            <span>Vaga Ativa</span>
                         </div>
                     </div>
-                    
-                    <!-- Stats -->
-                    <div class="stats-grid" style="margin-top: 2rem;">
-                        <div class="stat-card">
-                            <div class="stat-icon green">🚗</div>
-                            <div class="stat-info">
-                                <h3>Vagas Hoje</h3>
-                                <div class="stat-value" id="mySpotsToday">0</div>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon blue">💰</div>
-                            <div class="stat-info">
-                                <h3>Ganhos Hoje</h3>
-                                <div class="stat-value" id="myEarningsToday">R$ 0,00</div>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon yellow">⭐</div>
-                            <div class="stat-info">
-                                <h3>Minha Avaliação</h3>
-                                <div class="stat-value" id="myRating">5.0</div>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon orange">💸</div>
-                            <div class="stat-info">
-                                <h3>Gorjetas Hoje</h3>
-                                <div class="stat-value" id="myTipsToday">R$ 0,00</div>
-                            </div>
-                        </div>
+                </div>
+                
+                <!-- Cards View -->
+                <div id="cardsView" class="cards-grid" style="display: none;">
+                    <div class="loading">
+                        <div class="spinner"></div>
                     </div>
+                </div>
+                
+                <!-- Table View -->
+                <div id="tableView" class="table-container" style="display: none;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>CPF</th>
+                                <th>Área</th>
+                                <th>Status</th>
+                                <th>Avaliação</th>
+                                <th>Vagas Hoje</th>
+                                <th>Faturamento</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="guardsTableBody">
+                            <tr>
+                                <td colspan="8" class="loading">
+                                    <div class="spinner"></div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </main>
@@ -986,7 +916,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-        import { getFirestore, collection, getDocs, query, where, onSnapshot, doc, getDoc, addDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, query, where, onSnapshot, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
         
         const firebaseConfig = {
             apiKey: "AIzaSyBIRb8Y7ct6wBxeMQ86foRT1s3E2FC8QVY",
@@ -1017,10 +947,7 @@
                 await loadUserData();
                 initializeDashboard();
             } else {
-                // Fix for GitHub Pages
-                const currentPath = window.location.pathname;
-                const basePath = currentPath.substring(0, currentPath.lastIndexOf('/'));
-                window.location.href = basePath + '/index.html';
+                window.location.href = 'index.html';
             }
         });
         
@@ -1071,241 +998,11 @@
         
         // Initialize dashboard based on role
         function initializeDashboard() {
-            // Hide all content first
-            document.getElementById('adminContent').style.display = 'none';
-            document.getElementById('associationContent').style.display = 'none';
-            document.getElementById('guardContent').style.display = 'none';
-            
-            // Show content based on role
-            switch(userRole) {
-                case 'admin':
-                    document.getElementById('adminContent').style.display = 'block';
-                    loadAdminDashboard();
-                    break;
-                case 'association':
-                    document.getElementById('associationContent').style.display = 'block';
-                    loadAssociationDashboard();
-                    break;
-                case 'guard':
-                    document.getElementById('guardContent').style.display = 'block';
-                    loadGuardDashboard();
-                    break;
-            }
-        }
-        
-        // Load admin dashboard
-        async function loadAdminDashboard() {
-            try {
-                // Load pending associations
-                const pendingQuery = query(collection(db, 'associacoes_pendentes'), where('status', '==', 'pendente'));
-                const pendingSnapshot = await getDocs(pendingQuery);
-                
-                const pendingDiv = document.getElementById('pendingAssociations');
-                if (pendingSnapshot.empty) {
-                    pendingDiv.innerHTML = '<p style="text-align: center; color: var(--medium-gray);">Nenhuma associação pendente</p>';
-                } else {
-                    let html = '';
-                    pendingSnapshot.forEach(doc => {
-                        const data = doc.data();
-                        html += `
-                            <div class="association-card">
-                                <div class="association-info">
-                                    <h3>${data.nome}</h3>
-                                    <p>CNPJ: ${data.cnpj}</p>
-                                    <p>Responsável: ${data.responsavel}</p>
-                                    <p>Email: ${data.email}</p>
-                                    <p>WhatsApp: ${data.whatsapp}</p>
-                                    <p>Cidade: ${data.cidade}</p>
-                                    <p>Guardadores: ${data.quantidadeGuardadores}</p>
-                                </div>
-                                <div class="association-actions">
-                                    <button class="btn btn-primary" onclick="approveAssociation('${doc.id}')">Aprovar</button>
-                                    <button class="btn btn-secondary" onclick="rejectAssociation('${doc.id}')">Rejeitar</button>
-                                </div>
-                            </div>
-                        `;
-                    });
-                    pendingDiv.innerHTML = html;
-                }
-                
-                // Load active associations
-                const activeQuery = collection(db, 'associations');
-                const activeSnapshot = await getDocs(activeQuery);
-                
-                const activeDiv = document.getElementById('activeAssociations');
-                if (activeSnapshot.empty) {
-                    activeDiv.innerHTML = '<p style="text-align: center; color: var(--medium-gray);">Nenhuma associação ativa</p>';
-                } else {
-                    let html = '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem;">';
-                    activeSnapshot.forEach(doc => {
-                        const data = doc.data();
-                        html += `
-                            <div class="stat-card">
-                                <h4>${data.nome}</h4>
-                                <p style="color: var(--medium-gray); font-size: 0.875rem;">
-                                    CNPJ: ${data.cnpj}<br>
-                                    Guardadores: ${data.guardsCount || 0}<br>
-                                    Status: <span class="status-badge status-active">Ativa</span>
-                                </p>
-                            </div>
-                        `;
-                    });
-                    html += '</div>';
-                    activeDiv.innerHTML = html;
-                }
-                
-                // Update stats
-                document.getElementById('activeAssociationsCount').textContent = activeSnapshot.size;
-                
-                // Load all guards count
-                const guardsSnapshot = await getDocs(collection(db, 'guards'));
-                document.getElementById('totalGuardsCount').textContent = guardsSnapshot.size;
-                
-                // Load active spots
-                const spotsQuery = query(collection(db, 'spots'), where('active', '==', true));
-                const spotsSnapshot = await getDocs(spotsQuery);
-                document.getElementById('activeSpotsCount').textContent = spotsSnapshot.size;
-                
-                // Calculate today revenue
-                let todayRevenue = 0;
-                spotsSnapshot.forEach(doc => {
-                    const spot = doc.data();
-                    todayRevenue += spot.amount || 0;
-                });
-                document.getElementById('todayRevenue').textContent = `R$ ${todayRevenue.toFixed(2)}`;
-                
-            } catch (error) {
-                console.error('Error loading admin dashboard:', error);
-            }
-        }
-        
-        // Load association dashboard
-        async function loadAssociationDashboard() {
-            try {
-                // Get association data
-                const assocQuery = query(collection(db, 'associations'), where('email', '==', currentUser.email));
-                const assocSnapshot = await getDocs(assocQuery);
-                
-                if (!assocSnapshot.empty) {
-                    const assocDoc = assocSnapshot.docs[0];
-                    const assocId = assocDoc.id;
-                    const assocData = assocDoc.data();
-                    
-                    // Load my guards
-                    const guardsQuery = query(collection(db, 'guards'), where('associationId', '==', assocId));
-                    const guardsSnapshot = await getDocs(guardsQuery);
-                    
-                    document.getElementById('myGuardsCount').textContent = guardsSnapshot.size;
-                    
-                    // Display guards list
-                    const guardsList = document.getElementById('myGuardsList');
-                    if (guardsSnapshot.empty) {
-                        guardsList.innerHTML = '<p style="text-align: center; color: var(--medium-gray);">Nenhum guardador cadastrado</p>';
-                    } else {
-                        let html = '<div class="cards-grid">';
-                        guardsSnapshot.forEach(doc => {
-                            const guard = doc.data();
-                            html += `
-                                <div class="guard-card">
-                                    <div class="guard-header">
-                                        <div class="guard-avatar">${guard.name[0].toUpperCase()}</div>
-                                        <div class="guard-info">
-                                            <h3>${guard.name}</h3>
-                                            <p>CPF: ${formatCPF(guard.cpf)}</p>
-                                            <p>WhatsApp: ${guard.phone}</p>
-                                        </div>
-                                    </div>
-                                    <div class="guard-actions">
-                                        <button class="btn btn-primary" onclick="showGuardQR('${doc.id}')">Ver QR Code</button>
-                                        <button class="btn btn-secondary" onclick="editGuard('${doc.id}')">Editar</button>
-                                    </div>
-                                </div>
-                            `;
-                        });
-                        html += '</div>';
-                        guardsList.innerHTML = html;
-                    }
-                    
-                    // Setup add guard form
-                    document.getElementById('addGuardForm').addEventListener('submit', async (e) => {
-                        e.preventDefault();
-                        
-                        const guardData = {
-                            name: e.target[0].value,
-                            cpf: e.target[1].value.replace(/\D/g, ''),
-                            phone: e.target[2].value,
-                            area: e.target[3].value,
-                            email: e.target[4].value || `${e.target[1].value.replace(/\D/g, '')}@flanelinha.com.br`,
-                            pix: e.target[5].value,
-                            associationId: assocId,
-                            associationName: assocData.nome,
-                            rating: 5.0,
-                            createdAt: serverTimestamp()
-                        };
-                        
-                        try {
-                            await addDoc(collection(db, 'guards'), guardData);
-                            alert('Guardador cadastrado com sucesso!');
-                            e.target.reset();
-                            loadAssociationDashboard();
-                        } catch (error) {
-                            alert('Erro ao cadastrar guardador: ' + error.message);
-                        }
-                    });
-                }
-            } catch (error) {
-                console.error('Error loading association dashboard:', error);
-            }
-        }
-        
-        // Load guard dashboard
-        async function loadGuardDashboard() {
-            try {
-                // Get guard data
-                const guardQuery = query(collection(db, 'guards'), where('email', '==', currentUser.email));
-                const guardSnapshot = await getDocs(guardQuery);
-                
-                if (!guardSnapshot.empty) {
-                    const guardDoc = guardSnapshot.docs[0];
-                    const guardId = guardDoc.id;
-                    const guardData = guardDoc.data();
-                    
-                    // Generate QR Code
-                    const qrContainer = document.getElementById('myQRCode');
-                    qrContainer.innerHTML = ''; // Clear previous QR
-                    
-                    // QR Code data
-                    const qrData = {
-                        guardId: guardId,
-                        guardName: guardData.name,
-                        association: guardData.associationName
-                    };
-                    
-                    // WhatsApp link with guard info
-                    const whatsappNumber = '5598970173223';
-                    const message = `VAGA:${guardId}|${guardData.name}|${guardData.associationName}`;
-                    const whatsappLink = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-                    
-                    // Generate QR Code
-                    new QRCode(qrContainer, {
-                        text: whatsappLink,
-                        width: 256,
-                        height: 256,
-                        colorDark: "#FF6B00",
-                        colorLight: "#ffffff",
-                        correctLevel: QRCode.CorrectLevel.H
-                    });
-                    
-                    // Load guard stats
-                    // This would be real data from spots collection
-                    document.getElementById('mySpotsToday').textContent = '0';
-                    document.getElementById('myEarningsToday').textContent = 'R$ 0,00';
-                    document.getElementById('myRating').textContent = guardData.rating || '5.0';
-                    document.getElementById('myTipsToday').textContent = 'R$ 0,00';
-                }
-            } catch (error) {
-                console.error('Error loading guard dashboard:', error);
-            }
+            loadStats();
+            initializeMap();
+            loadGuards();
+            loadActiveSpots();
+            setupRealtimeListeners();
         }
         
         // Initialize map
@@ -1541,73 +1238,93 @@
             document.getElementById('sidebar').classList.toggle('collapsed');
         };
         
-        window.approveAssociation = async (docId) => {
-            try {
-                // Get association data
-                const pendingDoc = await getDoc(doc(db, 'associacoes_pendentes', docId));
-                const data = pendingDoc.data();
-                
-                // Create association
-                await addDoc(collection(db, 'associations'), {
-                    ...data,
-                    status: 'active',
-                    approvedAt: serverTimestamp(),
-                    approvedBy: currentUser.email,
-                    guardsCount: 0
-                });
-                
-                // Create user account for association
-                // This would need Cloud Functions in production
-                
-                // Update pending status
-                await updateDoc(doc(db, 'associacoes_pendentes', docId), {
-                    status: 'aprovado'
-                });
-                
-                alert('Associação aprovada com sucesso!');
-                loadAdminDashboard();
-            } catch (error) {
-                alert('Erro ao aprovar associação: ' + error.message);
+        window.switchView = (view) => {
+            document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.getElementById('mapView').style.display = view === 'map' ? 'block' : 'none';
+            document.getElementById('cardsView').style.display = view === 'cards' ? 'grid' : 'none';
+            document.getElementById('tableView').style.display = view === 'table' ? 'block' : 'none';
+            
+            if (view === 'map') {
+                setTimeout(() => map.invalidateSize(), 100);
             }
         };
         
-        window.rejectAssociation = async (docId) => {
-            if (!confirm('Tem certeza que deseja rejeitar esta associação?')) return;
+        window.viewGuardDetails = async (guardId) => {
+            const guard = guards.find(g => g.id === guardId);
+            if (!guard) return;
             
-            try {
-                await updateDoc(doc(db, 'associacoes_pendentes', docId), {
-                    status: 'rejeitado',
-                    rejectedAt: serverTimestamp(),
-                    rejectedBy: currentUser.email
-                });
+            document.getElementById('modalBody').innerHTML = `
+                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;">
+                    <div class="guard-avatar" style="width: 80px; height: 80px; font-size: 2rem;">
+                        ${guard.name[0].toUpperCase()}
+                    </div>
+                    <div>
+                        <h3>${guard.name}</h3>
+                        <p>CPF: ${formatCPF(guard.cpf)}</p>
+                        <p>WhatsApp: ${guard.phone}</p>
+                    </div>
+                </div>
                 
-                alert('Associação rejeitada');
-                loadAdminDashboard();
-            } catch (error) {
-                alert('Erro ao rejeitar associação: ' + error.message);
-            }
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
+                    <div>
+                        <strong>Área:</strong> ${guard.area || 'N/A'}
+                    </div>
+                    <div>
+                        <strong>Avaliação:</strong> ${'⭐'.repeat(Math.floor(guard.rating || 5))} ${guard.rating || 5.0}
+                    </div>
+                    <div>
+                        <strong>Vagas Hoje:</strong> ${guard.spotsToday || 0}
+                    </div>
+                    <div>
+                        <strong>Status:</strong> 
+                        <span class="status-badge status-${guard.status}">
+                            ${guard.status === 'busy' ? 'Ocupado' : 'Disponível'}
+                        </span>
+                    </div>
+                </div>
+                
+                <h4 style="margin-top: 2rem;">Estatísticas do Mês</h4>
+                <canvas id="guardChart" width="400" height="200"></canvas>
+            `;
+            
+            document.getElementById('guardModal').style.display = 'flex';
+            
+            // Create chart
+            setTimeout(() => {
+                const ctx = document.getElementById('guardChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4'],
+                        datasets: [{
+                            label: 'Faturamento Semanal',
+                            data: [450, 520, 480, 550],
+                            borderColor: '#FF6B00',
+                            tension: 0.1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                });
+            }, 100);
         };
         
         window.showGuardQR = (guardId) => {
-            // This would show QR in a modal
-            alert('QR Code do guardador: ' + guardId);
+            // Show QR code modal
         };
         
-        window.editGuard = (guardId) => {
-            // This would open edit form
-            alert('Editar guardador: ' + guardId);
-        };
-        
-        window.printQRCode = () => {
-            window.print();
+        window.closeModal = () => {
+            document.getElementById('guardModal').style.display = 'none';
         };
         
         window.logout = async () => {
             try {
                 await signOut(auth);
-                const currentPath = window.location.pathname;
-                const basePath = currentPath.substring(0, currentPath.lastIndexOf('/'));
-                window.location.href = basePath + '/index.html';
+                window.location.href = 'index.html';
             } catch (error) {
                 console.error('Logout error:', error);
             }
@@ -1618,6 +1335,30 @@
             if (!cpf) return '';
             return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
         }
+        
+        // Load stats
+        async function loadStats() {
+            // This would load real stats from Firestore
+            // For now using placeholder data
+        }
+        
+        // Search functionality
+        document.getElementById('globalSearch').addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            
+            const filtered = guards.filter(guard => 
+                guard.name.toLowerCase().includes(searchTerm) ||
+                guard.cpf.includes(searchTerm) ||
+                guard.area?.toLowerCase().includes(searchTerm)
+            );
+            
+            // Update views with filtered data
+        });
+        
+        // Filter functionality
+        document.getElementById('statusFilter').addEventListener('change', () => {
+            // Apply filters
+        });
     </script>
 </body>
 </html>
