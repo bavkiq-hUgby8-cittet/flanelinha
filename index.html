@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flanelinha - Sistema de Gestão</title>
+    
+    <!-- Firebase SDK v9 -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-analytics.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, onSnapshot, query, where, orderBy, serverTimestamp, updateDoc, deleteDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBIRb8Y7ct6wBxeMQ86foRT1s3E2FC8QVY",
+            authDomain: "flanelinha-ltda.firebaseapp.com",
+            projectId: "flanelinha-ltda",
+            storageBucket: "flanelinha-ltda.firebasestorage.app",
+            messagingSenderId: "396982431821",
+            appId: "1:396982431821:web:fbdcbbc22c9bcde83bac04",
+            measurementId: "G-RKQYWL7M31"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        window.auth = auth;
+        window.db = db;
+        window.signInWithEmailAndPassword = signInWithEmailAndPassword;
+        window.onAuthStateChanged = onAuthStateChanged;
+        window.signOut = signOut;
+        window.collection = collection;
+        window.addDoc = addDoc;
+        window.getDocs = getDocs;
+        window.doc = doc;
+        window.onSnapshot = onSnapshot;
+        window.query = query;
+        window.where = where;
+        window.orderBy = orderBy;
+        window.serverTimestamp = serverTimestamp;
+        window.updateDoc = updateDoc;
+        window.deleteDoc = deleteDoc;
+        window.getDoc = getDoc;
+    </script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+        }
+        
+        /* Login Screen */
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .login-box {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .login-box h1 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #333;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .btn:hover {
+            background: #5a67d8;
+        }
+        
+        /* Dashboard */
+        .dashboard {
+            display: none;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            color: #667eea;
+            font-size: 1.5rem;
+        }
+        
+        .header button {
+            padding: 0.5rem 1rem;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .stat-card h3 {
+            color: #666;
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-card .value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #e5e7eb;
+        }
+        
+        .tab {
+            padding: 0.75rem 1.5rem;
+            background: none;
+            border: none;
+            font-size: 1rem;
+            cursor: pointer;
+            position: relative;
+            color: #666;
+        }
+        
+        .tab.active {
+            color: #667eea;
+        }
+        
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #667eea;
+        }
+        
+        .content-area {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .section {
+            display: none;
+        }
+        
+        .section.active {
+            display: block;
+        }
+        
+        /* Forms */
+        .add-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        /* Tables */
+        .table-container {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            text-align: left;
+            padding: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        th {
+            font-weight: 600;
+            color: #666;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        .status-active {
+            background: #10b981;
+            color: white;
+        }
+        
+        .status-inactive {
+            background: #ef4444;
+            color: white;
+        }
+        
+        /* QR Code Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+        }
+        
+        .modal-content h2 {
+            margin-bottom: 1rem;
+        }
+        
+        #qrcode {
+            margin: 2rem auto;
+            display: inline-block;
+        }
+        
+        .close-modal {
+            padding: 0.75rem 1.5rem;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        /* Actions */
+        .actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .btn-small {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+        
+        .btn-qr {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .btn-edit {
+            background: #f59e0b;
+            color: white;
+        }
+        
+        .btn-delete {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .btn-end {
+            background: #10b981;
+            color: white;
+        }
+        
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+        
+        .empty-state svg {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .tabs {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .add-form {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div class="login-container" id="loginScreen">
+        <div class="login-box">
+            <h1>🚗 Flanelinha</h1>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="email" value="admin@flanelinha.com.br" required>
+                </div>
+                <div class="form-group">
+                    <label>Senha</label>
+                    <input type="password" id="password" required>
+                </div>
+                <button type="submit" class="btn">Entrar</button>
+            </form>
+            <div id="loginError" style="color: red; margin-top: 1rem; text-align: center;"></div>
+        </div>
+    </div>
+    
+    <!-- Dashboard -->
+    <div class="dashboard" id="dashboard">
+        <header class="header">
+            <h1>🚗 Flanelinha - Sistema de Gestão</h1>
+            <button onclick="logout()">Sair</button>
+        </header>
+        
+        <div class="container">
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Guardadores Ativos</h3>
+                    <div class="value" id="activeGuards">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Vagas Ativas</h3>
+                    <div class="value" id="activeSpots">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Faturamento Hoje</h3>
+                    <div class="value" id="todayRevenue">R$ 0,00</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Total de Clientes</h3>
+                    <div class="value" id="totalClients">0</div>
+                </div>
+            </div>
+            
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('guards')">Guardadores</button>
+                <button class="tab" onclick="switchTab('spots')">Vagas Ativas</button>
+                <button class="tab" onclick="switchTab('history')">Histórico</button>
+                <button class="tab" onclick="switchTab('reports')">Relatórios</button>
+            </div>
+            
+            <!-- Content -->
+            <div class="content-area">
+                <!-- Guards Section -->
+                <div id="guards" class="section active">
+                    <h2>Cadastro de Guardadores</h2>
+                    <form id="guardForm" class="add-form">
+                        <div class="form-group">
+                            <input type="text" id="guardName" placeholder="Nome completo" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="guardCpf" placeholder="CPF" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="guardPhone" placeholder="WhatsApp" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="guardArea" placeholder="Área de atuação" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="guardPix" placeholder="Chave PIX" required>
+                        </div>
+                        <button type="submit" class="btn">Cadastrar Guardador</button>
+                    </form>
+                    
+                    <div id="guardsList" class="table-container">
+                        <div class="loading">Carregando guardadores...</div>
+                    </div>
+                </div>
+                
+                <!-- Active Spots Section -->
+                <div id="spots" class="section">
+                    <h2>Vagas Ativas</h2>
+                    <div id="spotsList" class="table-container">
+                        <div class="loading">Carregando vagas...</div>
+                    </div>
+                </div>
+                
+                <!-- History Section -->
+                <div id="history" class="section">
+                    <h2>Histórico de Vagas</h2>
+                    <div id="historyList" class="table-container">
+                        <div class="loading">Carregando histórico...</div>
+                    </div>
+                </div>
+                
+                <!-- Reports Section -->
+                <div id="reports" class="section">
+                    <h2>Relatórios</h2>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <h3>Faturamento Mensal</h3>
+                            <div class="value" id="monthRevenue">R$ 0,00</div>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Ticket Médio</h3>
+                            <div class="value" id="avgTicket">R$ 0,00</div>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Total de Vagas</h3>
+                            <div class="value" id="totalSpots">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Gorjeta Média</h3>
+                            <div class="value" id="avgTip">R$ 0,00</div>
+                        </div>
+                    </div>
+                    
+                    <h3 style="margin-top: 2rem;">Top Guardadores</h3>
+                    <div id="topGuards" class="table-container">
+                        <div class="loading">Carregando relatório...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- QR Code Modal -->
+    <div id="qrModal" class="modal">
+        <div class="modal-content">
+            <h2 id="qrTitle">QR Code do Guardador</h2>
+            <div id="qrcode"></div>
+            <p id="qrInfo" style="margin-bottom: 1rem;"></p>
+            <button class="close-modal" onclick="closeQRModal()">Fechar</button>
+        </div>
+    </div>
+    
+    <script>
+        // Global variables
+        let currentUser = null;
+        let guardsListener = null;
+        let spotsListener = null;
+        let qrCodeInstance = null;
+        
+        // Initialize
+        window.onAuthStateChanged(window.auth, (user) => {
+            if (user) {
+                currentUser = user;
+                showDashboard();
+            } else {
+                showLogin();
+            }
+        });
+        
+        // Login
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            try {
+                await window.signInWithEmailAndPassword(window.auth, email, password);
+                document.getElementById('loginError').textContent = '';
+            } catch (error) {
+                document.getElementById('loginError').textContent = 'Email ou senha incorretos';
+            }
+        });
+        
+        // Logout
+        function logout() {
+            window.signOut(window.auth);
+        }
+        
+        // Show/Hide screens
+        function showLogin() {
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('dashboard').style.display = 'none';
+            if (guardsListener) guardsListener();
+            if (spotsListener) spotsListener();
+        }
+        
+        function showDashboard() {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+            loadDashboard();
+        }
+        
+        // Tab switching
+        function switchTab(tabName) {
+            // Update tabs
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Update sections
+            document.querySelectorAll('.section').forEach(section => section.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            
+            // Load data for the tab
+            if (tabName === 'history') loadHistory();
+            if (tabName === 'reports') loadReports();
+        }
+        
+        // Load dashboard data
+        async function loadDashboard() {
+            loadGuards();
+            loadActiveSpots();
+            loadStats();
+        }
+        
+        // Load guards
+        async function loadGuards() {
+            const guardsList = document.getElementById('guardsList');
+            
+            try {
+                const guardsRef = window.collection(window.db, 'guards');
+                const snapshot = await window.getDocs(guardsRef);
+                
+                if (snapshot.empty) {
+                    guardsList.innerHTML = '<div class="empty-state">Nenhum guardador cadastrado</div>';
+                    return;
+                }
+                
+                let html = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>CPF</th>
+                                <th>WhatsApp</th>
+                                <th>Área</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                snapshot.forEach(doc => {
+                    const guard = doc.data();
+                    html += `
+                        <tr>
+                            <td>${guard.name}</td>
+                            <td>${formatCPF(guard.cpf)}</td>
+                            <td>${guard.phone}</td>
+                            <td>${guard.area}</td>
+                            <td><span class="status-badge status-active">Ativo</span></td>
+                            <td>
+                                <div class="actions">
+                                    <button class="btn-small btn-qr" onclick="showQRCode('${doc.id}', '${guard.name}')">QR Code</button>
+                                    <button class="btn-small btn-delete" onclick="deleteGuard('${doc.id}')">Excluir</button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                });
+                
+                html += '</tbody></table>';
+                guardsList.innerHTML = html;
+                
+                // Update stats
+                document.getElementById('activeGuards').textContent = snapshot.size;
+            } catch (error) {
+                console.error('Error loading guards:', error);
+                guardsList.innerHTML = '<div class="empty-state">Erro ao carregar guardadores</div>';
+            }
+        }
+        
+        // Add guard
+        document.getElementById('guardForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const guardData = {
+                name: document.getElementById('guardName').value,
+                cpf: document.getElementById('guardCpf').value.replace(/\D/g, ''),
+                phone: document.getElementById('guardPhone').value,
+                area: document.getElementById('guardArea').value,
+                pix: document.getElementById('guardPix').value,
+                createdAt: window.serverTimestamp()
+            };
+            
+            try {
+                await window.addDoc(window.collection(window.db, 'guards'), guardData);
+                document.getElementById('guardForm').reset();
+                loadGuards();
+                alert('Guardador cadastrado com sucesso!');
+            } catch (error) {
+                console.error('Error adding guard:', error);
+                alert('Erro ao cadastrar guardador');
+            }
+        });
+        
+        // Delete guard
+        async function deleteGuard(guardId) {
+            if (!confirm('Tem certeza que deseja excluir este guardador?')) return;
+            
+            try {
+                await window.deleteDoc(window.doc(window.db, 'guards', guardId));
+                loadGuards();
+                alert('Guardador excluído com sucesso!');
+            } catch (error) {
+                console.error('Error deleting guard:', error);
+                alert('Erro ao excluir guardador');
+            }
+        }
+        
+        // Show QR Code
+        function showQRCode(guardId, guardName) {
+            const modal = document.getElementById('qrModal');
+            const qrDiv = document.getElementById('qrcode');
+            
+            // Clear previous QR code
+            qrDiv.innerHTML = '';
+            
+            // Generate WhatsApp link
+            const whatsappNumber = '5591982892700'; // Número do bot
+            const message = `GUARD:${guardId}`;
+            const whatsappLink = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+            
+            // Create QR code
+            qrCodeInstance = new QRCode(qrDiv, {
+                text: whatsappLink,
+                width: 256,
+                height: 256,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+            
+            // Update modal info
+            document.getElementById('qrTitle').textContent = `QR Code - ${guardName}`;
+            document.getElementById('qrInfo').textContent = 'Cliente escaneia para iniciar vaga';
+            
+            // Show modal
+            modal.style.display = 'flex';
+        }
+        
+        // Close QR Modal
+        function closeQRModal() {
+            document.getElementById('qrModal').style.display = 'none';
+        }
+        
+        // Load active spots
+        async function loadActiveSpots() {
+            const spotsList = document.getElementById('spotsList');
+            
+            try {
+                const spotsRef = window.collection(window.db, 'spots');
+                const q = window.query(spotsRef, window.where('active', '==', true));
+                const snapshot = await window.getDocs(q);
+                
+                if (snapshot.empty) {
+                    spotsList.innerHTML = '<div class="empty-state">Nenhuma vaga ativa no momento</div>';
+                    document.getElementById('activeSpots').textContent = '0';
+                    return;
+                }
+                
+                let html = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Cliente</th>
+                                <th>Veículo</th>
+                                <th>Guardador</th>
+                                <th>Início</th>
+                                <th>Tempo</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                snapshot.forEach(doc => {
+                    const spot = doc.data();
+                    const startTime = spot.startTime?.toDate() || new Date();
+                    const duration = calculateDuration(startTime);
+                    
+                    html += `
+                        <tr>
+                            <td>${spot.clientName || 'Cliente'}<br><small>${spot.clientPhone}</small></td>
+                            <td>${spot.vehicle || 'Não informado'}</td>
+                            <td>${spot.guardName}</td>
+                            <td>${formatTime(startTime)}</td>
+                            <td>${duration}</td>
+                            <td>
+                                <button class="btn-small btn-end" onclick="endSpot('${doc.id}')">Encerrar</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                
+                html += '</tbody></table>';
+                spotsList.innerHTML = html;
+                
+                // Update stats
+                document.getElementById('activeSpots').textContent = snapshot.size;
+            } catch (error) {
+                console.error('Error loading spots:', error);
+                spotsList.innerHTML = '<div class="empty-state">Erro ao carregar vagas</div>';
+            }
+        }
+        
+        // End spot
+        async function endSpot(spotId) {
+            if (!confirm('Tem certeza que deseja encerrar esta vaga?')) return;
+            
+            try {
+                await window.updateDoc(window.doc(window.db, 'spots', spotId), {
+                    active: false,
+                    endTime: window.serverTimestamp()
+                });
+                loadActiveSpots();
+                alert('Vaga encerrada com sucesso!');
+            } catch (error) {
+                console.error('Error ending spot:', error);
+                alert('Erro ao encerrar vaga');
+            }
+        }
+        
+        // Load history
+        async function loadHistory() {
+            const historyList = document.getElementById('historyList');
+            
+            try {
+                const spotsRef = window.collection(window.db, 'spots');
+                const q = window.query(spotsRef, window.where('active', '==', false), window.orderBy('endTime', 'desc'));
+                const snapshot = await window.getDocs(q);
+                
+                if (snapshot.empty) {
+                    historyList.innerHTML = '<div class="empty-state">Nenhum histórico disponível</div>';
+                    return;
+                }
+                
+                let html = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Cliente</th>
+                                <th>Veículo</th>
+                                <th>Guardador</th>
+                                <th>Duração</th>
+                                <th>Valor</th>
+                                <th>Gorjeta</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                snapshot.forEach(doc => {
+                    const spot = doc.data();
+                    const startTime = spot.startTime?.toDate();
+                    const endTime = spot.endTime?.toDate();
+                    const duration = startTime && endTime ? calculateDurationBetween(startTime, endTime) : 'N/A';
+                    
+                    html += `
+                        <tr>
+                            <td>${formatDate(endTime)}</td>
+                            <td>${spot.clientName || 'Cliente'}<br><small>${spot.clientPhone}</small></td>
+                            <td>${spot.vehicle || 'Não informado'}</td>
+                            <td>${spot.guardName}</td>
+                            <td>${duration}</td>
+                            <td>R$ ${(spot.amount || 0).toFixed(2)}</td>
+                            <td>R$ ${(spot.tipAmount || 0).toFixed(2)}</td>
+                        </tr>
+                    `;
+                });
+                
+                html += '</tbody></table>';
+                historyList.innerHTML = html;
+            } catch (error) {
+                console.error('Error loading history:', error);
+                historyList.innerHTML = '<div class="empty-state">Erro ao carregar histórico</div>';
+            }
+        }
+        
+        // Load reports
+        async function loadReports() {
+            try {
+                const spotsRef = window.collection(window.db, 'spots');
+                const snapshot = await window.getDocs(spotsRef);
+                
+                let totalRevenue = 0;
+                let totalTips = 0;
+                let completedSpots = 0;
+                let guardStats = {};
+                
+                const now = new Date();
+                const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+                let monthRevenue = 0;
+                
+                snapshot.forEach(doc => {
+                    const spot = doc.data();
+                    if (!spot.active && spot.amount) {
+                        totalRevenue += spot.amount;
+                        completedSpots++;
+                        
+                        if (spot.tipAmount) {
+                            totalTips += spot.tipAmount;
+                        }
+                        
+                        // Check if from this month
+                        const endTime = spot.endTime?.toDate();
+                        if (endTime && endTime >= startOfMonth) {
+                            monthRevenue += spot.amount;
+                        }
+                        
+                        // Guard stats
+                        if (spot.guardName) {
+                            if (!guardStats[spot.guardName]) {
+                                guardStats[spot.guardName] = {
+                                    spots: 0,
+                                    revenue: 0,
+                                    tips: 0
+                                };
+                            }
+                            guardStats[spot.guardName].spots++;
+                            guardStats[spot.guardName].revenue += spot.amount;
+                            guardStats[spot.guardName].tips += (spot.tipAmount || 0);
+                        }
+                    }
+                });
+                
+                // Update stats
+                document.getElementById('monthRevenue').textContent = `R$ ${monthRevenue.toFixed(2)}`;
+                document.getElementById('avgTicket').textContent = completedSpots > 0 ? `R$ ${(totalRevenue / completedSpots).toFixed(2)}` : 'R$ 0,00';
+                document.getElementById('totalSpots').textContent = snapshot.size;
+                document.getElementById('avgTip').textContent = completedSpots > 0 ? `R$ ${(totalTips / completedSpots).toFixed(2)}` : 'R$ 0,00';
+                
+                // Top guards
+                const topGuardsDiv = document.getElementById('topGuards');
+                const sortedGuards = Object.entries(guardStats).sort((a, b) => b[1].revenue - a[1].revenue);
+                
+                if (sortedGuards.length === 0) {
+                    topGuardsDiv.innerHTML = '<div class="empty-state">Nenhum dado disponível</div>';
+                    return;
+                }
+                
+                let html = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Guardador</th>
+                                <th>Vagas</th>
+                                <th>Faturamento</th>
+                                <th>Gorjetas</th>
+                                <th>Média/Vaga</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                sortedGuards.slice(0, 10).forEach(([name, stats]) => {
+                    const avgPerSpot = stats.revenue / stats.spots;
+                    html += `
+                        <tr>
+                            <td>${name}</td>
+                            <td>${stats.spots}</td>
+                            <td>R$ ${stats.revenue.toFixed(2)}</td>
+                            <td>R$ ${stats.tips.toFixed(2)}</td>
+                            <td>R$ ${avgPerSpot.toFixed(2)}</td>
+                        </tr>
+                    `;
+                });
+                
+                html += '</tbody></table>';
+                topGuardsDiv.innerHTML = html;
+            } catch (error) {
+                console.error('Error loading reports:', error);
+            }
+        }
+        
+        // Load stats
+        async function loadStats() {
+            try {
+                // Today's revenue
+                const now = new Date();
+                const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                
+                const spotsRef = window.collection(window.db, 'spots');
+                const q = window.query(spotsRef, window.where('endTime', '>=', startOfDay));
+                const snapshot = await window.getDocs(q);
+                
+                let todayRevenue = 0;
+                snapshot.forEach(doc => {
+                    const spot = doc.data();
+                    if (spot.amount) {
+                        todayRevenue += spot.amount;
+                    }
+                });
+                
+                document.getElementById('todayRevenue').textContent = `R$ ${todayRevenue.toFixed(2)}`;
+                
+                // Total clients
+                const clientsRef = window.collection(window.db, 'clients');
+                const clientsSnapshot = await window.getDocs(clientsRef);
+                document.getElementById('totalClients').textContent = clientsSnapshot.size;
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+        
+        // Utility functions
+        function formatCPF(cpf) {
+            if (!cpf) return '';
+            return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+        }
+        
+        function formatDate(date) {
+            if (!date) return 'N/A';
+            return new Intl.DateTimeFormat('pt-BR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            }).format(date);
+        }
+        
+        function formatTime(date) {
+            if (!date) return 'N/A';
+            return new Intl.DateTimeFormat('pt-BR', {
+                hour: '2-digit',
+                minute: '2-digit'
+            }).format(date);
+        }
+        
+        function calculateDuration(startTime) {
+            const now = new Date();
+            const diff = now - startTime;
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            
+            if (hours > 0) {
+                return `${hours}h ${minutes}min`;
+            }
+            return `${minutes}min`;
+        }
+        
+        function calculateDurationBetween(startTime, endTime) {
+            const diff = endTime - startTime;
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            
+            if (hours > 0) {
+                return `${hours}h ${minutes}min`;
+            }
+            return `${minutes}min`;
+        }
+        
+        // Auto-refresh active spots every 30 seconds
+        setInterval(() => {
+            if (currentUser && document.getElementById('spots').classList.contains('active')) {
+                loadActiveSpots();
+            }
+        }, 30000);
+    </script>
+</body>
+</html>
