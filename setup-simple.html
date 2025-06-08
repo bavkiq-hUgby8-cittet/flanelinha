@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Setup Rápido - Flanelinha</title>
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+            background: #f5f5f5;
+        }
+        
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #FF6B00;
+        }
+        
+        button {
+            background: #FF6B00;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        
+        button:hover {
+            background: #E55A00;
+        }
+        
+        .status {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        code {
+            background: #f8f9fa;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Setup Rápido - Flanelinha</h1>
+        
+        <div id="status"></div>
+        
+        <div>
+            <h3>Este setup vai criar:</h3>
+            <ul>
+                <li>✅ Usuário admin master</li>
+                <li>✅ Uma associação de teste</li>
+                <li>✅ Um guardador de teste</li>
+            </ul>
+        </div>
+        
+        <div>
+            <button onclick="createAdminOnly()">👤 Criar Apenas Admin</button>
+            <button onclick="createFullSetup()">🎯 Setup Completo</button>
+        </div>
+        
+        <div id="result" style="margin-top: 20px;"></div>
+    </div>
+    
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyBIRb8Y7ct6wBxeMQ86foRT1s3E2FC8QVY",
+            authDomain: "flanelinha-ltda.firebaseapp.com",
+            projectId: "flanelinha-ltda",
+            storageBucket: "flanelinha-ltda.firebasestorage.app",
+            messagingSenderId: "396982431821",
+            appId: "1:396982431821:web:9ea195cea51d79b13bac04"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        
+        function showStatus(message, type = 'info') {
+            document.getElementById('status').className = 'status ' + type;
+            document.getElementById('status').innerHTML = message;
+        }
+        
+        function showResult(html) {
+            document.getElementById('result').innerHTML = html;
+        }
+        
+        window.createAdminOnly = async function() {
+            showStatus('Criando usuário admin...', 'info');
+            
+            try {
+                await createUserWithEmailAndPassword(auth, 'admin@flanelinha.com.br', 'admin123');
+                showStatus('✅ Admin criado com sucesso!', 'success');
+                showResult(`
+                    <h3>Credenciais do Admin:</h3>
+                    <p>
+                        <strong>E-mail:</strong> <code>admin@flanelinha.com.br</code><br>
+                        <strong>Senha:</strong> <code>admin123</code>
+                    </p>
+                    <p><a href="index.html">Ir para o Login</a></p>
+                `);
+            } catch (error) {
+                if (error.code === 'auth/email-already-in-use') {
+                    showStatus('ℹ️ Admin já existe! Use as credenciais abaixo:', 'info');
+                    showResult(`
+                        <h3>Credenciais do Admin:</h3>
+                        <p>
+                            <strong>E-mail:</strong> <code>admin@flanelinha.com.br</code><br>
+                            <strong>Senha:</strong> <code>admin123</code>
+                        </p>
+                        <p><a href="index.html">Ir para o Login</a></p>
+                    `);
+                } else {
+                    showStatus('❌ Erro: ' + error.message, 'error');
+                }
+            }
+        };
+        
+        window.createFullSetup = async function() {
+            showStatus('Iniciando setup completo...', 'info');
+            let resultHTML = '<h3>Resultados do Setup:</h3><ul>';
+            
+            try {
+                // 1. Admin
+                try {
+                    await createUserWithEmailAndPassword(auth, 'admin@flanelinha.com.br', 'admin123');
+                    resultHTML += '<li>✅ Admin criado</li>';
+                } catch (e) {
+                    if (e.code === 'auth/email-already-in-use') {
+                        resultHTML += '<li>ℹ️ Admin já existe</li>';
+                    }
+                }
+                
+                // 2. Associação
+                const assocEmail = 'associacao@teste.com';
+                try {
+                    await createUserWithEmailAndPassword(auth, assocEmail, 'teste123');
+                    
+                    const assocRef = await addDoc(collection(db, 'associations'), {
+                        nome: 'Associação Centro',
+                        cnpj: '12345678000190',
+                        responsavel: 'Maria Silva',
+                        email: assocEmail,
+                        whatsapp: '91987654321',
+                        cidade: 'Belém/PA',
+                        status: 'active',
+                        createdAt: serverTimestamp()
+                    });
+                    
+                    resultHTML += '<li>✅ Associação criada</li>';
+                    
+                    // 3. Guardador
+                    const guardCPF = '12345678901';
+                    const guardEmail = guardCPF + '@flanelinha.com.br';
+                    
+                    await createUserWithEmailAndPassword(auth, guardEmail, '123456');
+                    
+                    await addDoc(collection(db, 'guards'), {
+                        name: 'João Santos',
+                        cpf: guardCPF,
+                        email: guardEmail,
+                        phone: '91999887766',
+                        area: 'Centro',
+                        associationId: assocRef.id,
+                        associationName: 'Associação Centro',
+                        status: 'active',
+                        rating: 5.0,
+                        createdAt: serverTimestamp()
+                    });
+                    
+                    resultHTML += '<li>✅ Guardador criado</li>';
+                    
+                } catch (e) {
+                    if (e.code === 'auth/email-already-in-use') {
+                        resultHTML += '<li>ℹ️ Dados de teste já existem</li>';
+                    }
+                }
+                
+                resultHTML += '</ul>';
+                
+                showStatus('✅ Setup concluído!', 'success');
+                showResult(resultHTML + `
+                    <h3>Credenciais Criadas:</h3>
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 5px;">
+                        <h4>1. Admin Master:</h4>
+                        <p>E-mail: <code>admin@flanelinha.com.br</code><br>
+                        Senha: <code>admin123</code></p>
+                        
+                        <h4>2. Associação:</h4>
+                        <p>E-mail: <code>associacao@teste.com</code><br>
+                        Senha: <code>teste123</code></p>
+                        
+                        <h4>3. Guardador:</h4>
+                        <p>CPF: <code>12345678901</code><br>
+                        Senha: <code>123456</code></p>
+                    </div>
+                    <p style="margin-top: 20px;">
+                        <a href="index.html" style="background: #FF6B00; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">
+                            Ir para o Sistema
+                        </a>
+                    </p>
+                `);
+                
+            } catch (error) {
+                showStatus('❌ Erro: ' + error.message, 'error');
+                console.error(error);
+            }
+        };
+    </script>
+</body>
+</html>
