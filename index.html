@@ -813,7 +813,8 @@
             projectId: "flanelinha-ltda",
             storageBucket: "flanelinha-ltda.firebasestorage.app",
             messagingSenderId: "396982431821",
-            appId: "1:396982431821:web:fbdcbbc22c9bcde83bac04"
+            appId: "1:396982431821:web:9ea195cea51d79b13bac04",
+            measurementId: "G-3PPDZZGSDR"
         };
         
         const app = initializeApp(firebaseConfig);
@@ -883,8 +884,10 @@
                 // Try to login
                 const userCredential = await signInWithEmailAndPassword(auth, email, password);
                 
-                // Redirect to dashboard
-                window.location.href = 'dashboard.html';
+                // Redirect to dashboard - GitHub Pages fix
+                const currentPath = window.location.pathname;
+                const basePath = currentPath.substring(0, currentPath.lastIndexOf('/'));
+                window.location.href = basePath + '/dashboard.html';
                 
             } catch (error) {
                 console.error('Login error:', error);
