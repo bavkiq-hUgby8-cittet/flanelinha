@@ -5,11 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Flanelinha</title>
     
-    <!-- Leaflet CSS for Map -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    
-    <!-- Chart.js for Analytics -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- QR Code Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     
     <style>
         * {
@@ -34,7 +31,7 @@
         }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: var(--light-gray);
             color: var(--dark-gray);
         }
@@ -52,20 +49,12 @@
             box-shadow: 2px 0 10px var(--shadow);
             display: flex;
             flex-direction: column;
-            transition: width 0.3s;
-        }
-        
-        .sidebar.collapsed {
-            width: 70px;
         }
         
         .sidebar-header {
             padding: 1.5rem;
             background: var(--primary-orange);
             color: white;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
         }
         
         .logo {
@@ -87,18 +76,6 @@
             font-weight: bold;
         }
         
-        .sidebar.collapsed .logo-text {
-            display: none;
-        }
-        
-        .toggle-sidebar {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 1.25rem;
-            cursor: pointer;
-        }
-        
         /* Navigation */
         .nav-menu {
             flex: 1;
@@ -112,7 +89,7 @@
             color: var(--dark-gray);
             text-decoration: none;
             transition: all 0.3s;
-            position: relative;
+            cursor: pointer;
         }
         
         .nav-item:hover {
@@ -123,26 +100,7 @@
         .nav-item.active {
             background: rgba(255, 107, 0, 0.1);
             color: var(--primary-orange);
-        }
-        
-        .nav-item.active::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 4px;
-            background: var(--primary-orange);
-        }
-        
-        .nav-icon {
-            font-size: 1.25rem;
-            width: 40px;
-            text-align: center;
-        }
-        
-        .sidebar.collapsed .nav-text {
-            display: none;
+            border-left: 4px solid var(--primary-orange);
         }
         
         /* Main Content */
@@ -163,64 +121,10 @@
             align-items: center;
         }
         
-        .search-bar {
-            display: flex;
-            align-items: center;
-            background: var(--light-gray);
-            border-radius: 50px;
-            padding: 0.5rem 1.5rem;
-            width: 400px;
-        }
-        
-        .search-bar input {
-            background: none;
-            border: none;
-            outline: none;
-            flex: 1;
-            margin-left: 0.5rem;
-        }
-        
-        .header-actions {
+        .user-info {
             display: flex;
             align-items: center;
             gap: 1rem;
-        }
-        
-        .notification-btn {
-            background: none;
-            border: none;
-            font-size: 1.25rem;
-            cursor: pointer;
-            position: relative;
-        }
-        
-        .notification-badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: var(--danger);
-            color: white;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.75rem;
-        }
-        
-        .user-menu {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            cursor: pointer;
-            padding: 0.5rem;
-            border-radius: 50px;
-            transition: background 0.3s;
-        }
-        
-        .user-menu:hover {
-            background: var(--light-gray);
         }
         
         .user-avatar {
@@ -235,11 +139,19 @@
             font-weight: bold;
         }
         
-        /* Content Area */
+        /* Content */
         .content {
             flex: 1;
             padding: 2rem;
             overflow-y: auto;
+        }
+        
+        .page-section {
+            display: none;
+        }
+        
+        .page-section.active {
+            display: block;
         }
         
         /* Stats Cards */
@@ -255,215 +167,44 @@
             padding: 1.5rem;
             border-radius: 10px;
             box-shadow: 0 2px 10px var(--shadow);
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-        
-        .stat-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-        }
-        
-        .stat-icon.orange { background: rgba(255, 107, 0, 0.1); color: var(--primary-orange); }
-        .stat-icon.green { background: rgba(76, 175, 80, 0.1); color: var(--success); }
-        .stat-icon.blue { background: rgba(33, 150, 243, 0.1); color: var(--info); }
-        .stat-icon.yellow { background: rgba(255, 193, 7, 0.1); color: var(--warning); }
-        
-        .stat-info h3 {
-            font-size: 0.875rem;
-            color: var(--medium-gray);
-            margin-bottom: 0.25rem;
         }
         
         .stat-value {
-            font-size: 1.5rem;
+            font-size: 2rem;
             font-weight: bold;
-            color: var(--dark-gray);
+            color: var(--primary-orange);
         }
         
-        /* Filters */
-        .filters-section {
+        /* Forms */
+        .form-container {
             background: var(--white);
-            padding: 1.5rem;
+            padding: 2rem;
             border-radius: 10px;
             box-shadow: 0 2px 10px var(--shadow);
-            margin-bottom: 2rem;
+            max-width: 600px;
         }
         
-        .filters-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
+        .form-group {
+            margin-bottom: 1.5rem;
         }
         
-        .filters-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-        }
-        
-        .filter-group label {
+        .form-group label {
             display: block;
             margin-bottom: 0.5rem;
             font-weight: 500;
-            color: var(--medium-gray);
         }
         
-        .filter-group select,
-        .filter-group input {
+        .form-group input,
+        .form-group select {
             width: 100%;
-            padding: 0.5rem;
+            padding: 0.75rem;
             border: 1px solid #ddd;
             border-radius: 5px;
-            background: var(--white);
         }
         
-        /* View Toggle */
-        .view-toggle {
-            display: flex;
-            gap: 0.5rem;
-        }
-        
-        .view-btn {
-            padding: 0.5rem 1rem;
-            background: var(--light-gray);
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .view-btn.active {
-            background: var(--primary-orange);
-            color: white;
-        }
-        
-        /* Map Container */
-        .map-container {
-            background: var(--white);
-            border-radius: 10px;
-            box-shadow: 0 2px 10px var(--shadow);
-            height: 500px;
-            margin-bottom: 2rem;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        #map {
-            height: 100%;
-            width: 100%;
-        }
-        
-        .map-legend {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            background: white;
-            padding: 1rem;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px var(--shadow);
-            z-index: 1000;
-        }
-        
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 0.5rem;
-        }
-        
-        .legend-marker {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-        }
-        
-        /* Cards Grid */
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.5rem;
-        }
-        
-        .guard-card {
-            background: var(--white);
-            border-radius: 10px;
-            box-shadow: 0 2px 10px var(--shadow);
-            overflow: hidden;
-            transition: transform 0.3s;
-        }
-        
-        .guard-card:hover {
-            transform: translateY(-5px);
-        }
-        
-        .guard-header {
-            padding: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-        
-        .guard-avatar {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: var(--primary-orange);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
-        
-        .guard-info h3 {
-            margin-bottom: 0.25rem;
-        }
-        
-        .guard-rating {
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-            color: var(--warning);
-        }
-        
-        .guard-stats {
-            padding: 1rem 1.5rem;
-            background: var(--light-gray);
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1rem;
-            text-align: center;
-        }
-        
-        .guard-stat-value {
-            font-size: 1.25rem;
-            font-weight: bold;
-            color: var(--dark-gray);
-        }
-        
-        .guard-stat-label {
-            font-size: 0.75rem;
-            color: var(--medium-gray);
-        }
-        
-        .guard-actions {
-            padding: 1rem 1.5rem;
-            display: flex;
-            gap: 0.5rem;
-        }
-        
+        /* Buttons */
         .btn {
-            flex: 1;
-            padding: 0.5rem 1rem;
+            padding: 0.75rem 1.5rem;
             border: none;
             border-radius: 5px;
             cursor: pointer;
@@ -485,16 +226,12 @@
             color: var(--dark-gray);
         }
         
-        .btn-secondary:hover {
-            background: #e0e0e0;
-        }
-        
-        /* Table View */
-        .table-container {
+        /* Table */
+        .data-table {
             background: var(--white);
             border-radius: 10px;
-            box-shadow: 0 2px 10px var(--shadow);
             overflow: hidden;
+            box-shadow: 0 2px 10px var(--shadow);
         }
         
         table {
@@ -507,7 +244,6 @@
             padding: 1rem;
             text-align: left;
             font-weight: 600;
-            color: var(--dark-gray);
         }
         
         td {
@@ -515,35 +251,7 @@
             border-bottom: 1px solid var(--light-gray);
         }
         
-        tr:hover {
-            background: rgba(255, 107, 0, 0.05);
-        }
-        
-        /* Status Badge */
-        .status-badge {
-            display: inline-block;
-            padding: 0.25rem 0.75rem;
-            border-radius: 50px;
-            font-size: 0.875rem;
-            font-weight: 500;
-        }
-        
-        .status-active {
-            background: rgba(76, 175, 80, 0.1);
-            color: var(--success);
-        }
-        
-        .status-inactive {
-            background: rgba(244, 67, 54, 0.1);
-            color: var(--danger);
-        }
-        
-        .status-busy {
-            background: rgba(255, 193, 7, 0.1);
-            color: var(--warning);
-        }
-        
-        /* Modal */
+        /* QR Code Modal */
         .modal {
             display: none;
             position: fixed;
@@ -552,179 +260,105 @@
             right: 0;
             bottom: 0;
             background: rgba(0, 0, 0, 0.5);
-            z-index: 2000;
-            align-items: center;
+            z-index: 1000;
             justify-content: center;
+            align-items: center;
         }
         
         .modal-content {
-            background: var(--white);
+            background: white;
             padding: 2rem;
             border-radius: 10px;
-            max-width: 600px;
+            max-width: 500px;
             width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
+            text-align: center;
         }
         
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
+        .qr-container {
+            margin: 2rem auto;
+            display: inline-block;
+            padding: 1rem;
+            background: white;
+            border: 2px solid var(--primary-orange);
+            border-radius: 10px;
         }
         
-        .close-modal {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: var(--medium-gray);
-        }
-        
-        /* Responsive */
-        @media (max-width: 768px) {
-            .sidebar {
-                position: fixed;
-                left: -260px;
-                z-index: 1500;
-                transition: left 0.3s;
+        @media print {
+            body * {
+                visibility: hidden;
             }
-            
-            .sidebar.mobile-open {
+            .modal-content, .modal-content * {
+                visibility: visible;
+            }
+            .modal-content {
+                position: absolute;
                 left: 0;
+                top: 0;
             }
-            
-            .search-bar {
-                width: auto;
-                flex: 1;
-            }
-            
-            .filters-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-        
-        /* Loading */
-        .loading {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 3rem;
-        }
-        
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 5px solid var(--light-gray);
-            border-top-color: var(--primary-orange);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
     <div class="dashboard-container">
         <!-- Sidebar -->
-        <aside class="sidebar" id="sidebar">
+        <aside class="sidebar">
             <div class="sidebar-header">
                 <div class="logo">
                     <div class="logo-icon">F</div>
-                    <span class="logo-text">Flanelinha</span>
+                    <span>Flanelinha</span>
                 </div>
-                <button class="toggle-sidebar" onclick="toggleSidebar()">☰</button>
             </div>
             
             <nav class="nav-menu">
                 <!-- Admin Menu -->
                 <div id="adminMenu" style="display: none;">
-                    <a href="#dashboard" class="nav-item active">
-                        <span class="nav-icon">📊</span>
-                        <span class="nav-text">Dashboard</span>
+                    <a class="nav-item active" onclick="showPage('dashboard')">
+                        <span>📊 Dashboard</span>
                     </a>
-                    <a href="#associations" class="nav-item">
-                        <span class="nav-icon">🏢</span>
-                        <span class="nav-text">Associações</span>
+                    <a class="nav-item" onclick="showPage('associations')">
+                        <span>🏢 Associações</span>
                     </a>
-                    <a href="#guards" class="nav-item">
-                        <span class="nav-icon">👥</span>
-                        <span class="nav-text">Guardadores</span>
+                    <a class="nav-item" onclick="showPage('allGuards')">
+                        <span>👥 Todos Guardadores</span>
                     </a>
-                    <a href="#spots" class="nav-item">
-                        <span class="nav-icon">🚗</span>
-                        <span class="nav-text">Vagas Ativas</span>
-                    </a>
-                    <a href="#financial" class="nav-item">
-                        <span class="nav-icon">💰</span>
-                        <span class="nav-text">Financeiro</span>
-                    </a>
-                    <a href="#settings" class="nav-item">
-                        <span class="nav-icon">⚙️</span>
-                        <span class="nav-text">Configurações</span>
+                    <a class="nav-item" onclick="showPage('spots')">
+                        <span>🚗 Vagas Ativas</span>
                     </a>
                 </div>
                 
                 <!-- Association Menu -->
                 <div id="associationMenu" style="display: none;">
-                    <a href="#dashboard" class="nav-item active">
-                        <span class="nav-icon">📊</span>
-                        <span class="nav-text">Dashboard</span>
+                    <a class="nav-item active" onclick="showPage('dashboard')">
+                        <span>📊 Dashboard</span>
                     </a>
-                    <a href="#my-guards" class="nav-item">
-                        <span class="nav-icon">👥</span>
-                        <span class="nav-text">Meus Guardadores</span>
+                    <a class="nav-item" onclick="showPage('guards')">
+                        <span>👥 Meus Guardadores</span>
                     </a>
-                    <a href="#active-spots" class="nav-item">
-                        <span class="nav-icon">🚗</span>
-                        <span class="nav-text">Vagas Ativas</span>
+                    <a class="nav-item" onclick="showPage('addGuard')">
+                        <span>➕ Cadastrar Guardador</span>
                     </a>
-                    <a href="#reports" class="nav-item">
-                        <span class="nav-icon">📈</span>
-                        <span class="nav-text">Relatórios</span>
-                    </a>
-                    <a href="#financial" class="nav-item">
-                        <span class="nav-icon">💰</span>
-                        <span class="nav-text">Financeiro</span>
+                    <a class="nav-item" onclick="showPage('spots')">
+                        <span>🚗 Vagas Ativas</span>
                     </a>
                 </div>
                 
                 <!-- Guard Menu -->
                 <div id="guardMenu" style="display: none;">
-                    <a href="#my-profile" class="nav-item active">
-                        <span class="nav-icon">👤</span>
-                        <span class="nav-text">Meu Perfil</span>
+                    <a class="nav-item active" onclick="showPage('myProfile')">
+                        <span>👤 Meu Perfil</span>
                     </a>
-                    <a href="#my-qrcode" class="nav-item">
-                        <span class="nav-icon">📱</span>
-                        <span class="nav-text">Meu QR Code</span>
+                    <a class="nav-item" onclick="showPage('myQR')">
+                        <span>📱 Meu QR Code</span>
                     </a>
-                    <a href="#my-spots" class="nav-item">
-                        <span class="nav-icon">🚗</span>
-                        <span class="nav-text">Minhas Vagas</span>
-                    </a>
-                    <a href="#my-earnings" class="nav-item">
-                        <span class="nav-icon">💰</span>
-                        <span class="nav-text">Meus Ganhos</span>
-                    </a>
-                    <a href="#my-ratings" class="nav-item">
-                        <span class="nav-icon">⭐</span>
-                        <span class="nav-text">Avaliações</span>
+                    <a class="nav-item" onclick="showPage('mySpots')">
+                        <span>🚗 Minhas Vagas</span>
                     </a>
                 </div>
             </nav>
             
-            <div class="sidebar-footer" style="padding: 1rem;">
+            <div style="padding: 1rem;">
                 <button onclick="logout()" class="btn btn-secondary" style="width: 100%;">
-                    <span class="nav-icon">🚪</span>
-                    <span class="nav-text">Sair</span>
+                    🚪 Sair
                 </button>
             </div>
         </aside>
@@ -733,190 +367,141 @@
         <main class="main-content">
             <!-- Header -->
             <header class="header">
-                <div class="search-bar">
-                    <span>🔍</span>
-                    <input type="text" placeholder="Buscar guardador, associação, CPF..." id="globalSearch">
-                </div>
-                
-                <div class="header-actions">
-                    <button class="notification-btn">
-                        🔔
-                        <span class="notification-badge">3</span>
-                    </button>
-                    
-                    <div class="user-menu">
-                        <div class="user-avatar" id="userAvatar">A</div>
-                        <div>
-                            <div id="userName" style="font-weight: 500;">Carregando...</div>
-                            <div id="userRole" style="font-size: 0.875rem; color: var(--medium-gray);">...</div>
-                        </div>
+                <h2 id="pageTitle">Dashboard</h2>
+                <div class="user-info">
+                    <div>
+                        <div id="userName" style="font-weight: 500;">Carregando...</div>
+                        <div id="userRole" style="font-size: 0.875rem; color: var(--medium-gray);">...</div>
                     </div>
+                    <div class="user-avatar" id="userAvatar">?</div>
                 </div>
             </header>
             
             <!-- Content -->
             <div class="content">
-                <!-- Stats Cards -->
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon orange">👥</div>
-                        <div class="stat-info">
+                <!-- Dashboard Page -->
+                <div id="dashboardPage" class="page-section active">
+                    <div class="stats-grid">
+                        <div class="stat-card">
                             <h3>Guardadores Ativos</h3>
-                            <div class="stat-value" id="activeGuardsCount">0</div>
+                            <div class="stat-value" id="activeGuards">0</div>
                         </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon green">🚗</div>
-                        <div class="stat-info">
-                            <h3>Vagas Ativas Agora</h3>
-                            <div class="stat-value" id="activeSpotsCount">0</div>
+                        <div class="stat-card">
+                            <h3>Vagas Ativas</h3>
+                            <div class="stat-value" id="activeSpots">0</div>
                         </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon blue">💰</div>
-                        <div class="stat-info">
+                        <div class="stat-card">
                             <h3>Faturamento Hoje</h3>
-                            <div class="stat-value" id="todayRevenue">R$ 0,00</div>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon yellow">⭐</div>
-                        <div class="stat-info">
-                            <h3>Avaliação Média</h3>
-                            <div class="stat-value" id="avgRating">4.8</div>
+                            <div class="stat-value">R$ <span id="todayRevenue">0,00</span></div>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Filters Section -->
-                <div class="filters-section">
-                    <div class="filters-header">
-                        <h2>Filtros</h2>
-                        <div class="view-toggle">
-                            <button class="view-btn active" onclick="switchView('map')">🗺️ Mapa</button>
-                            <button class="view-btn" onclick="switchView('cards')">📇 Cards</button>
-                            <button class="view-btn" onclick="switchView('table')">📋 Tabela</button>
-                        </div>
-                    </div>
-                    <div class="filters-grid">
-                        <div class="filter-group">
-                            <label>Status</label>
-                            <select id="statusFilter">
-                                <option value="">Todos</option>
-                                <option value="active">Disponível</option>
-                                <option value="busy">Ocupado</option>
-                                <option value="offline">Offline</option>
-                            </select>
-                        </div>
-                        <div class="filter-group">
-                            <label>Área/Região</label>
-                            <select id="areaFilter">
-                                <option value="">Todas</option>
-                                <option value="centro">Centro</option>
-                                <option value="norte">Zona Norte</option>
-                                <option value="sul">Zona Sul</option>
-                                <option value="leste">Zona Leste</option>
-                                <option value="oeste">Zona Oeste</option>
-                            </select>
-                        </div>
-                        <div class="filter-group">
-                            <label>Avaliação Mínima</label>
-                            <select id="ratingFilter">
-                                <option value="">Qualquer</option>
-                                <option value="5">⭐⭐⭐⭐⭐ 5.0</option>
-                                <option value="4">⭐⭐⭐⭐ 4.0+</option>
-                                <option value="3">⭐⭐⭐ 3.0+</option>
-                            </select>
-                        </div>
-                        <div class="filter-group">
-                            <label>Associação</label>
-                            <select id="associationFilter">
-                                <option value="">Todas</option>
-                            </select>
-                        </div>
+                <!-- Guards List Page -->
+                <div id="guardsPage" class="page-section">
+                    <div class="data-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>CPF</th>
+                                    <th>WhatsApp</th>
+                                    <th>Status</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="guardsTableBody">
+                                <tr>
+                                    <td colspan="5" style="text-align: center;">Carregando...</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
                 
-                <!-- Map View -->
-                <div id="mapView" class="map-container">
-                    <div id="map"></div>
-                    <div class="map-legend">
-                        <h4>Legenda</h4>
-                        <div class="legend-item">
-                            <div class="legend-marker" style="background: #4CAF50;"></div>
-                            <span>Disponível</span>
-                        </div>
-                        <div class="legend-item">
-                            <div class="legend-marker" style="background: #FFC107;"></div>
-                            <span>Ocupado</span>
-                        </div>
-                        <div class="legend-item">
-                            <div class="legend-marker" style="background: #F44336;"></div>
-                            <span>Offline</span>
-                        </div>
-                        <div class="legend-item">
-                            <div class="legend-marker" style="background: #2196F3;"></div>
-                            <span>Vaga Ativa</span>
-                        </div>
+                <!-- Add Guard Page -->
+                <div id="addGuardPage" class="page-section">
+                    <div class="form-container">
+                        <h3>Cadastrar Novo Guardador</h3>
+                        <form id="addGuardForm">
+                            <div class="form-group">
+                                <label>Nome Completo *</label>
+                                <input type="text" name="name" required>
+                            </div>
+                            <div class="form-group">
+                                <label>CPF *</label>
+                                <input type="text" name="cpf" placeholder="000.000.000-00" required>
+                            </div>
+                            <div class="form-group">
+                                <label>WhatsApp *</label>
+                                <input type="tel" name="phone" placeholder="(00) 00000-0000" required>
+                            </div>
+                            <div class="form-group">
+                                <label>E-mail</label>
+                                <input type="email" name="email" placeholder="opcional@email.com">
+                            </div>
+                            <div class="form-group">
+                                <label>Área de Atuação</label>
+                                <input type="text" name="area" placeholder="Ex: Centro, Zona Sul">
+                            </div>
+                            <button type="submit" class="btn btn-primary">Cadastrar Guardador</button>
+                        </form>
                     </div>
                 </div>
                 
-                <!-- Cards View -->
-                <div id="cardsView" class="cards-grid" style="display: none;">
-                    <div class="loading">
-                        <div class="spinner"></div>
+                <!-- My QR Code Page (Guard) -->
+                <div id="myQRPage" class="page-section">
+                    <div class="form-container" style="text-align: center;">
+                        <h3>Meu QR Code</h3>
+                        <p>Este é o seu QR Code pessoal. Imprima e use no seu colete.</p>
+                        <div id="myQRCode" style="margin: 2rem auto;"></div>
+                        <button onclick="window.print()" class="btn btn-primary">🖨️ Imprimir QR Code</button>
                     </div>
                 </div>
                 
-                <!-- Table View -->
-                <div id="tableView" class="table-container" style="display: none;">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Nome</th>
-                                <th>CPF</th>
-                                <th>Área</th>
-                                <th>Status</th>
-                                <th>Avaliação</th>
-                                <th>Vagas Hoje</th>
-                                <th>Faturamento</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="guardsTableBody">
-                            <tr>
-                                <td colspan="8" class="loading">
-                                    <div class="spinner"></div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <!-- Active Spots Page -->
+                <div id="spotsPage" class="page-section">
+                    <div class="data-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Cliente</th>
+                                    <th>Guardador</th>
+                                    <th>Início</th>
+                                    <th>Local</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="spotsTableBody">
+                                <tr>
+                                    <td colspan="5" style="text-align: center;">Nenhuma vaga ativa</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </main>
     </div>
     
-    <!-- Guard Details Modal -->
-    <div id="guardModal" class="modal">
+    <!-- QR Code Modal -->
+    <div id="qrModal" class="modal">
         <div class="modal-content">
-            <div class="modal-header">
-                <h2>Detalhes do Guardador</h2>
-                <button class="close-modal" onclick="closeModal()">&times;</button>
+            <h3 id="qrModalTitle">QR Code do Guardador</h3>
+            <div class="qr-container">
+                <div id="modalQRCode"></div>
             </div>
-            <div id="modalBody">
-                <!-- Dynamic content -->
-            </div>
+            <p id="qrModalInfo" style="margin: 1rem 0;"></p>
+            <button onclick="window.print()" class="btn btn-primary" style="margin-right: 1rem;">🖨️ Imprimir</button>
+            <button onclick="closeModal()" class="btn btn-secondary">Fechar</button>
         </div>
     </div>
-    
-    <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     
     <!-- Firebase -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-        import { getFirestore, collection, getDocs, query, where, onSnapshot, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged, signOut, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, query, where, doc, getDoc, serverTimestamp, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
         
         const firebaseConfig = {
             apiKey: "AIzaSyBIRb8Y7ct6wBxeMQ86foRT1s3E2FC8QVY",
@@ -924,8 +509,7 @@
             projectId: "flanelinha-ltda",
             storageBucket: "flanelinha-ltda.firebasestorage.app",
             messagingSenderId: "396982431821",
-            appId: "1:396982431821:web:9ea195cea51d79b13bac04",
-            measurementId: "G-3PPDZZGSDR"
+            appId: "1:396982431821:web:9ea195cea51d79b13bac04"
         };
         
         const app = initializeApp(firebaseConfig);
@@ -935,10 +519,8 @@
         // Global variables
         let currentUser = null;
         let userRole = null;
-        let map = null;
-        let markers = [];
-        let guards = [];
-        let spots = [];
+        let userData = null;
+        let associationId = null;
         
         // Initialize
         onAuthStateChanged(auth, async (user) => {
@@ -951,44 +533,44 @@
             }
         });
         
-        // Load user data and determine role
+        // Load user data
         async function loadUserData() {
             try {
                 // Check if admin
                 if (currentUser.email === 'admin@flanelinha.com.br') {
                     userRole = 'admin';
+                    userData = { name: 'Administrador', email: currentUser.email };
                     document.getElementById('adminMenu').style.display = 'block';
-                    document.getElementById('userName').textContent = 'Administrador';
-                    document.getElementById('userRole').textContent = 'Admin Master';
-                    document.getElementById('userAvatar').textContent = 'A';
+                    updateUserDisplay('Administrador', 'Admin Master', 'A');
                     return;
                 }
                 
-                // Check if association
+                // Check associations
                 const assocQuery = query(collection(db, 'associations'), where('email', '==', currentUser.email));
                 const assocSnapshot = await getDocs(assocQuery);
                 
                 if (!assocSnapshot.empty) {
-                    const assocData = assocSnapshot.docs[0].data();
                     userRole = 'association';
+                    userData = assocSnapshot.docs[0].data();
+                    associationId = assocSnapshot.docs[0].id;
                     document.getElementById('associationMenu').style.display = 'block';
-                    document.getElementById('userName').textContent = assocData.nome;
-                    document.getElementById('userRole').textContent = 'Associação';
-                    document.getElementById('userAvatar').textContent = assocData.nome[0].toUpperCase();
+                    updateUserDisplay(userData.nome, 'Associação', userData.nome[0]);
                     return;
                 }
                 
-                // Check if guard
+                // Check guards
                 const guardQuery = query(collection(db, 'guards'), where('email', '==', currentUser.email));
                 const guardSnapshot = await getDocs(guardQuery);
                 
                 if (!guardSnapshot.empty) {
-                    const guardData = guardSnapshot.docs[0].data();
                     userRole = 'guard';
+                    userData = guardSnapshot.docs[0].data();
+                    userData.id = guardSnapshot.docs[0].id;
                     document.getElementById('guardMenu').style.display = 'block';
-                    document.getElementById('userName').textContent = guardData.name;
-                    document.getElementById('userRole').textContent = 'Guardador';
-                    document.getElementById('userAvatar').textContent = guardData.name[0].toUpperCase();
+                    updateUserDisplay(userData.name, 'Guardador', userData.name[0]);
+                    
+                    // Generate QR Code for guard
+                    generateGuardQR();
                     return;
                 }
             } catch (error) {
@@ -996,332 +578,223 @@
             }
         }
         
-        // Initialize dashboard based on role
-        function initializeDashboard() {
-            loadStats();
-            initializeMap();
-            loadGuards();
-            loadActiveSpots();
-            setupRealtimeListeners();
+        function updateUserDisplay(name, role, avatar) {
+            document.getElementById('userName').textContent = name;
+            document.getElementById('userRole').textContent = role;
+            document.getElementById('userAvatar').textContent = avatar.toUpperCase();
         }
         
-        // Initialize map
-        function initializeMap() {
-            // Default to Belém coordinates
-            map = L.map('map').setView([-1.4558, -48.4902], 13);
+        // Initialize dashboard
+        function initializeDashboard() {
+            loadDashboardStats();
             
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap contributors'
-            }).addTo(map);
-            
-            // Try to get user location
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition((position) => {
-                    map.setView([position.coords.latitude, position.coords.longitude], 13);
-                });
+            if (userRole === 'association' || userRole === 'admin') {
+                loadGuards();
+            }
+        }
+        
+        // Load dashboard stats
+        async function loadDashboardStats() {
+            try {
+                let guardsCount = 0;
+                let spotsCount = 0;
+                
+                if (userRole === 'admin') {
+                    const guardsSnapshot = await getDocs(collection(db, 'guards'));
+                    guardsCount = guardsSnapshot.size;
+                } else if (userRole === 'association') {
+                    const guardsQuery = query(collection(db, 'guards'), where('associationId', '==', associationId));
+                    const guardsSnapshot = await getDocs(guardsQuery);
+                    guardsCount = guardsSnapshot.size;
+                }
+                
+                document.getElementById('activeGuards').textContent = guardsCount;
+                document.getElementById('activeSpots').textContent = spotsCount;
+            } catch (error) {
+                console.error('Error loading stats:', error);
             }
         }
         
         // Load guards
         async function loadGuards() {
             try {
-                let guardsQuery = collection(db, 'guards');
-                
-                // Filter by association if not admin
-                if (userRole === 'association') {
-                    // Get association ID and filter guards
+                let guardsQuery;
+                if (userRole === 'admin') {
+                    guardsQuery = collection(db, 'guards');
+                } else if (userRole === 'association') {
+                    guardsQuery = query(collection(db, 'guards'), where('associationId', '==', associationId));
                 }
                 
                 const snapshot = await getDocs(guardsQuery);
-                guards = [];
+                const tbody = document.getElementById('guardsTableBody');
                 
+                if (snapshot.empty) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Nenhum guardador cadastrado</td></tr>';
+                    return;
+                }
+                
+                tbody.innerHTML = '';
                 snapshot.forEach(doc => {
-                    const data = doc.data();
-                    guards.push({
-                        id: doc.id,
-                        ...data,
-                        status: data.currentSpotId ? 'busy' : 'active',
-                        location: data.lastLocation || generateRandomLocation()
-                    });
+                    const guard = doc.data();
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${guard.name}</td>
+                        <td>${formatCPF(guard.cpf)}</td>
+                        <td>${guard.phone}</td>
+                        <td><span style="color: var(--success);">Ativo</span></td>
+                        <td>
+                            <button onclick="showGuardQR('${doc.id}', '${guard.name}')" class="btn btn-primary" style="padding: 0.5rem 1rem;">
+                                📱 Ver QR Code
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
                 });
-                
-                updateMap();
-                updateCardsView();
-                updateTableView();
             } catch (error) {
                 console.error('Error loading guards:', error);
             }
         }
         
-        // Load active spots
-        async function loadActiveSpots() {
-            try {
-                const spotsQuery = query(collection(db, 'spots'), where('active', '==', true));
-                const snapshot = await getDocs(spotsQuery);
-                
-                spots = [];
-                snapshot.forEach(doc => {
-                    spots.push({
-                        id: doc.id,
-                        ...doc.data()
-                    });
+        // Generate QR Code for guard
+        function generateGuardQR() {
+            if (userRole !== 'guard') return;
+            
+            const whatsappNumber = '5598970173223';
+            const guardName = userData.name;
+            const guardId = userData.id;
+            
+            // Create WhatsApp link with guard data
+            const message = `Olá! Sou ${guardName}, guardador da Flanelinha. Gostaria de iniciar uma vaga.`;
+            const whatsappLink = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}&guardId=${guardId}`;
+            
+            // Generate QR Code
+            const qrContainer = document.getElementById('myQRCode');
+            if (qrContainer) {
+                qrContainer.innerHTML = '';
+                new QRCode(qrContainer, {
+                    text: whatsappLink,
+                    width: 256,
+                    height: 256,
+                    colorDark: "#FF6B00",
+                    colorLight: "#ffffff"
                 });
-                
-                updateStats();
-            } catch (error) {
-                console.error('Error loading spots:', error);
             }
         }
         
-        // Update map markers
-        function updateMap() {
-            // Clear existing markers
-            markers.forEach(marker => map.removeLayer(marker));
-            markers = [];
+        // Show guard QR Code
+        window.showGuardQR = function(guardId, guardName) {
+            const modal = document.getElementById('qrModal');
+            const qrContainer = document.getElementById('modalQRCode');
             
-            // Add guard markers
-            guards.forEach(guard => {
-                if (guard.location) {
-                    const color = guard.status === 'busy' ? '#FFC107' : '#4CAF50';
-                    const marker = L.circleMarker([guard.location.lat, guard.location.lng], {
-                        radius: 10,
-                        fillColor: color,
-                        color: '#fff',
-                        weight: 2,
-                        opacity: 1,
-                        fillOpacity: 0.8
-                    }).addTo(map);
-                    
-                    marker.bindPopup(`
-                        <strong>${guard.name}</strong><br>
-                        ${guard.area}<br>
-                        Status: ${guard.status === 'busy' ? 'Ocupado' : 'Disponível'}<br>
-                        ⭐ ${guard.rating || 5.0}
-                    `);
-                    
-                    markers.push(marker);
-                }
+            document.getElementById('qrModalTitle').textContent = `QR Code - ${guardName}`;
+            document.getElementById('qrModalInfo').textContent = `ID: ${guardId}`;
+            
+            // Clear previous QR
+            qrContainer.innerHTML = '';
+            
+            // Generate WhatsApp link
+            const whatsappNumber = '5598970173223';
+            const message = `Olá! Sou ${guardName}, guardador da Flanelinha. Gostaria de iniciar uma vaga.`;
+            const whatsappLink = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}&guardId=${guardId}`;
+            
+            // Generate QR Code
+            new QRCode(qrContainer, {
+                text: whatsappLink,
+                width: 256,
+                height: 256,
+                colorDark: "#FF6B00",
+                colorLight: "#ffffff"
             });
             
-            // Add spot markers
-            spots.forEach(spot => {
-                if (spot.location) {
-                    const marker = L.marker([spot.location.lat, spot.location.lng], {
-                        icon: L.divIcon({
-                            html: '🚗',
-                            iconSize: [30, 30],
-                            className: 'spot-marker'
-                        })
-                    }).addTo(map);
-                    
-                    marker.bindPopup(`
-                        <strong>Vaga Ativa</strong><br>
-                        Cliente: ${spot.clientName}<br>
-                        Veículo: ${spot.vehicle}<br>
-                        Guardador: ${spot.guardName}
-                    `);
-                    
-                    markers.push(marker);
-                }
-            });
-        }
+            modal.style.display = 'flex';
+        };
         
-        // Update stats
-        function updateStats() {
-            document.getElementById('activeGuardsCount').textContent = guards.filter(g => g.status === 'active').length;
-            document.getElementById('activeSpotsCount').textContent = spots.length;
+        // Add guard form submission
+        document.getElementById('addGuardForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
             
-            // Calculate today's revenue
-            const todayRevenue = spots.reduce((total, spot) => total + (spot.amount || 0), 0);
-            document.getElementById('todayRevenue').textContent = `R$ ${todayRevenue.toFixed(2)}`;
-        }
-        
-        // Setup realtime listeners
-        function setupRealtimeListeners() {
-            // Listen for guards updates
-            onSnapshot(collection(db, 'guards'), (snapshot) => {
-                loadGuards();
-            });
-            
-            // Listen for spots updates
-            onSnapshot(query(collection(db, 'spots'), where('active', '==', true)), (snapshot) => {
-                loadActiveSpots();
-            });
-        }
-        
-        // Generate random location near Belém for demo
-        function generateRandomLocation() {
-            const baseLat = -1.4558;
-            const baseLng = -48.4902;
-            const offset = 0.05;
-            
-            return {
-                lat: baseLat + (Math.random() - 0.5) * offset,
-                lng: baseLng + (Math.random() - 0.5) * offset
+            const formData = new FormData(e.target);
+            const guardData = {
+                name: formData.get('name'),
+                cpf: formData.get('cpf').replace(/\D/g, ''),
+                phone: formData.get('phone'),
+                email: formData.get('email') || `${formData.get('cpf').replace(/\D/g, '')}@flanelinha.com.br`,
+                area: formData.get('area'),
+                associationId: associationId,
+                associationName: userData.nome,
+                status: 'active',
+                rating: 5.0,
+                createdAt: serverTimestamp()
             };
-        }
-        
-        // Update cards view
-        function updateCardsView() {
-            const container = document.getElementById('cardsView');
             
-            if (guards.length === 0) {
-                container.innerHTML = '<div class="empty-state">Nenhum guardador encontrado</div>';
-                return;
+            try {
+                // Create auth account for guard
+                const tempPassword = guardData.cpf.substring(0, 6);
+                await createUserWithEmailAndPassword(auth, guardData.email, tempPassword);
+                
+                // Add guard to Firestore
+                await addDoc(collection(db, 'guards'), guardData);
+                
+                alert(`Guardador cadastrado com sucesso!\n\nE-mail: ${guardData.email}\nSenha temporária: ${tempPassword}\n\nOriente o guardador a alterar a senha no primeiro acesso.`);
+                
+                e.target.reset();
+                showPage('guards');
+            } catch (error) {
+                console.error('Error adding guard:', error);
+                alert('Erro ao cadastrar guardador: ' + error.message);
+            }
+        });
+        
+        // Page navigation
+        window.showPage = function(page) {
+            // Hide all pages
+            document.querySelectorAll('.page-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Remove active from nav items
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Show selected page
+            switch(page) {
+                case 'dashboard':
+                    document.getElementById('dashboardPage').classList.add('active');
+                    document.getElementById('pageTitle').textContent = 'Dashboard';
+                    loadDashboardStats();
+                    break;
+                case 'guards':
+                case 'allGuards':
+                    document.getElementById('guardsPage').classList.add('active');
+                    document.getElementById('pageTitle').textContent = 'Guardadores';
+                    loadGuards();
+                    break;
+                case 'addGuard':
+                    document.getElementById('addGuardPage').classList.add('active');
+                    document.getElementById('pageTitle').textContent = 'Cadastrar Guardador';
+                    break;
+                case 'myQR':
+                    document.getElementById('myQRPage').classList.add('active');
+                    document.getElementById('pageTitle').textContent = 'Meu QR Code';
+                    generateGuardQR();
+                    break;
+                case 'spots':
+                case 'mySpots':
+                    document.getElementById('spotsPage').classList.add('active');
+                    document.getElementById('pageTitle').textContent = 'Vagas Ativas';
+                    break;
             }
             
-            container.innerHTML = guards.map(guard => `
-                <div class="guard-card">
-                    <div class="guard-header">
-                        <div class="guard-avatar">${guard.name[0].toUpperCase()}</div>
-                        <div class="guard-info">
-                            <h3>${guard.name}</h3>
-                            <div class="guard-rating">
-                                ${'⭐'.repeat(Math.floor(guard.rating || 5))}
-                                <span>${guard.rating || 5.0}</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="guard-stats">
-                        <div>
-                            <div class="guard-stat-value">${guard.spotsToday || 0}</div>
-                            <div class="guard-stat-label">Vagas Hoje</div>
-                        </div>
-                        <div>
-                            <div class="guard-stat-value">R$ ${(guard.todayEarnings || 0).toFixed(2)}</div>
-                            <div class="guard-stat-label">Ganhos Hoje</div>
-                        </div>
-                        <div>
-                            <div class="guard-stat-value">${guard.area || 'N/A'}</div>
-                            <div class="guard-stat-label">Área</div>
-                        </div>
-                    </div>
-                    <div class="guard-actions">
-                        <button class="btn btn-primary" onclick="viewGuardDetails('${guard.id}')">Ver Detalhes</button>
-                        <button class="btn btn-secondary" onclick="showGuardQR('${guard.id}')">QR Code</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-        
-        // Update table view
-        function updateTableView() {
-            const tbody = document.getElementById('guardsTableBody');
-            
-            if (guards.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="8" class="empty-state">Nenhum guardador encontrado</td></tr>';
-                return;
-            }
-            
-            tbody.innerHTML = guards.map(guard => `
-                <tr>
-                    <td>${guard.name}</td>
-                    <td>${formatCPF(guard.cpf)}</td>
-                    <td>${guard.area || 'N/A'}</td>
-                    <td>
-                        <span class="status-badge status-${guard.status}">
-                            ${guard.status === 'busy' ? 'Ocupado' : 'Disponível'}
-                        </span>
-                    </td>
-                    <td>${'⭐'.repeat(Math.floor(guard.rating || 5))} ${guard.rating || 5.0}</td>
-                    <td>${guard.spotsToday || 0}</td>
-                    <td>R$ ${(guard.todayEarnings || 0).toFixed(2)}</td>
-                    <td>
-                        <button class="btn btn-primary btn-small" onclick="viewGuardDetails('${guard.id}')">Detalhes</button>
-                    </td>
-                </tr>
-            `).join('');
-        }
-        
-        // Global functions
-        window.toggleSidebar = () => {
-            document.getElementById('sidebar').classList.toggle('collapsed');
-        };
-        
-        window.switchView = (view) => {
-            document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
+            // Set active nav item
             event.target.classList.add('active');
-            
-            document.getElementById('mapView').style.display = view === 'map' ? 'block' : 'none';
-            document.getElementById('cardsView').style.display = view === 'cards' ? 'grid' : 'none';
-            document.getElementById('tableView').style.display = view === 'table' ? 'block' : 'none';
-            
-            if (view === 'map') {
-                setTimeout(() => map.invalidateSize(), 100);
-            }
         };
         
-        window.viewGuardDetails = async (guardId) => {
-            const guard = guards.find(g => g.id === guardId);
-            if (!guard) return;
-            
-            document.getElementById('modalBody').innerHTML = `
-                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;">
-                    <div class="guard-avatar" style="width: 80px; height: 80px; font-size: 2rem;">
-                        ${guard.name[0].toUpperCase()}
-                    </div>
-                    <div>
-                        <h3>${guard.name}</h3>
-                        <p>CPF: ${formatCPF(guard.cpf)}</p>
-                        <p>WhatsApp: ${guard.phone}</p>
-                    </div>
-                </div>
-                
-                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
-                    <div>
-                        <strong>Área:</strong> ${guard.area || 'N/A'}
-                    </div>
-                    <div>
-                        <strong>Avaliação:</strong> ${'⭐'.repeat(Math.floor(guard.rating || 5))} ${guard.rating || 5.0}
-                    </div>
-                    <div>
-                        <strong>Vagas Hoje:</strong> ${guard.spotsToday || 0}
-                    </div>
-                    <div>
-                        <strong>Status:</strong> 
-                        <span class="status-badge status-${guard.status}">
-                            ${guard.status === 'busy' ? 'Ocupado' : 'Disponível'}
-                        </span>
-                    </div>
-                </div>
-                
-                <h4 style="margin-top: 2rem;">Estatísticas do Mês</h4>
-                <canvas id="guardChart" width="400" height="200"></canvas>
-            `;
-            
-            document.getElementById('guardModal').style.display = 'flex';
-            
-            // Create chart
-            setTimeout(() => {
-                const ctx = document.getElementById('guardChart').getContext('2d');
-                new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4'],
-                        datasets: [{
-                            label: 'Faturamento Semanal',
-                            data: [450, 520, 480, 550],
-                            borderColor: '#FF6B00',
-                            tension: 0.1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false
-                    }
-                });
-            }, 100);
+        window.closeModal = function() {
+            document.getElementById('qrModal').style.display = 'none';
         };
         
-        window.showGuardQR = (guardId) => {
-            // Show QR code modal
-        };
-        
-        window.closeModal = () => {
-            document.getElementById('guardModal').style.display = 'none';
-        };
-        
-        window.logout = async () => {
+        window.logout = async function() {
             try {
                 await signOut(auth);
                 window.location.href = 'index.html';
@@ -1335,30 +808,6 @@
             if (!cpf) return '';
             return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
         }
-        
-        // Load stats
-        async function loadStats() {
-            // This would load real stats from Firestore
-            // For now using placeholder data
-        }
-        
-        // Search functionality
-        document.getElementById('globalSearch').addEventListener('input', (e) => {
-            const searchTerm = e.target.value.toLowerCase();
-            
-            const filtered = guards.filter(guard => 
-                guard.name.toLowerCase().includes(searchTerm) ||
-                guard.cpf.includes(searchTerm) ||
-                guard.area?.toLowerCase().includes(searchTerm)
-            );
-            
-            // Update views with filtered data
-        });
-        
-        // Filter functionality
-        document.getElementById('statusFilter').addEventListener('change', () => {
-            // Apply filters
-        });
     </script>
 </body>
 </html>
