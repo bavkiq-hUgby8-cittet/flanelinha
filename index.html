@@ -5,47 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flanelinha - Sistema de Gestão</title>
     
-    <!-- Firebase SDK v9 -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-analytics.js";
-        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, doc, onSnapshot, query, where, orderBy, serverTimestamp, updateDoc, deleteDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyBIRb8Y7ct6wBxeMQ86foRT1s3E2FC8QVY",
-            authDomain: "flanelinha-ltda.firebaseapp.com",
-            projectId: "flanelinha-ltda",
-            storageBucket: "flanelinha-ltda.firebasestorage.app",
-            messagingSenderId: "396982431821",
-            appId: "1:396982431821:web:fbdcbbc22c9bcde83bac04",
-            measurementId: "G-RKQYWL7M31"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        window.auth = auth;
-        window.db = db;
-        window.signInWithEmailAndPassword = signInWithEmailAndPassword;
-        window.onAuthStateChanged = onAuthStateChanged;
-        window.signOut = signOut;
-        window.collection = collection;
-        window.addDoc = addDoc;
-        window.getDocs = getDocs;
-        window.doc = doc;
-        window.onSnapshot = onSnapshot;
-        window.query = query;
-        window.where = where;
-        window.orderBy = orderBy;
-        window.serverTimestamp = serverTimestamp;
-        window.updateDoc = updateDoc;
-        window.deleteDoc = deleteDoc;
-        window.getDoc = getDoc;
-    </script>
-    
+    <!-- QR Code Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     
     <style>
@@ -117,6 +77,11 @@
         
         .btn:hover {
             background: #5a67d8;
+        }
+        
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
         }
         
         /* Dashboard */
@@ -362,11 +327,15 @@
             color: #666;
         }
         
-        .empty-state svg {
-            width: 100px;
-            height: 100px;
-            margin-bottom: 1rem;
-            opacity: 0.3;
+        /* Debug Info */
+        .debug-info {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 5px;
+            font-size: 0.875rem;
+            color: #92400e;
         }
         
         /* Responsive */
@@ -402,11 +371,15 @@
                 </div>
                 <div class="form-group">
                     <label>Senha</label>
-                    <input type="password" id="password" required>
+                    <input type="password" id="password" placeholder="Digite sua senha" required>
                 </div>
-                <button type="submit" class="btn">Entrar</button>
+                <button type="submit" class="btn" id="loginBtn">Entrar</button>
             </form>
             <div id="loginError" style="color: red; margin-top: 1rem; text-align: center;"></div>
+            <div id="debugInfo" class="debug-info" style="display: none; margin-top: 1rem;">
+                <strong>Debug Info:</strong>
+                <div id="debugContent"></div>
+            </div>
         </div>
     </div>
     
@@ -531,42 +504,146 @@
             <button class="close-modal" onclick="closeQRModal()">Fechar</button>
         </div>
     </div>
+
+    <!-- Firebase SDK v9 - Script Separado -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, query, where, orderBy, serverTimestamp, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+        // Debug info
+        const debugDiv = document.getElementById('debugInfo');
+        const debugContent = document.getElementById('debugContent');
+        
+        function showDebug(message) {
+            debugDiv.style.display = 'block';
+            debugContent.innerHTML += `<div>${new Date().toLocaleTimeString()}: ${message}</div>`;
+        }
+
+        try {
+            showDebug('Iniciando configuração do Firebase...');
+            
+            const firebaseConfig = {
+                apiKey: "AIzaSyBIRb8Y7ct6wBxeMQ86foRT1s3E2FC8QVY",
+                authDomain: "flanelinha-ltda.firebaseapp.com",
+                projectId: "flanelinha-ltda",
+                storageBucket: "flanelinha-ltda.firebasestorage.app",
+                messagingSenderId: "396982431821",
+                appId: "1:396982431821:web:fbdcbbc22c9bcde83bac04"
+            };
+
+            const app = initializeApp(firebaseConfig);
+            const auth = getAuth(app);
+            const db = getFirestore(app);
+            
+            showDebug('Firebase inicializado com sucesso!');
+
+            // Expor para o escopo global
+            window.firebaseApp = app;
+            window.auth = auth;
+            window.db = db;
+            
+            // Expor funções necessárias
+            window.signInWithEmailAndPassword = signInWithEmailAndPassword;
+            window.onAuthStateChanged = onAuthStateChanged;
+            window.signOut = signOut;
+            window.collection = collection;
+            window.addDoc = addDoc;
+            window.getDocs = getDocs;
+            window.doc = doc;
+            window.query = query;
+            window.where = where;
+            window.orderBy = orderBy;
+            window.serverTimestamp = serverTimestamp;
+            window.updateDoc = updateDoc;
+            window.deleteDoc = deleteDoc;
+            
+            showDebug('Funções exportadas para window');
+            
+            // Inicializar listeners de autenticação
+            initializeAuth();
+            
+        } catch (error) {
+            showDebug(`Erro ao inicializar Firebase: ${error.message}`);
+            console.error('Firebase initialization error:', error);
+        }
+        
+        function initializeAuth() {
+            showDebug('Configurando listener de autenticação...');
+            
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    showDebug(`Usuário autenticado: ${user.email}`);
+                    window.currentUser = user;
+                    showDashboard();
+                } else {
+                    showDebug('Usuário não autenticado');
+                    window.currentUser = null;
+                    showLogin();
+                }
+            });
+        }
+        
+        // Função de login
+        window.handleLogin = async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const loginBtn = document.getElementById('loginBtn');
+            const errorDiv = document.getElementById('loginError');
+            
+            showDebug(`Tentando login com: ${email}`);
+            
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'Entrando...';
+            errorDiv.textContent = '';
+            
+            try {
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                showDebug(`Login bem-sucedido: ${userCredential.user.email}`);
+                errorDiv.textContent = '';
+            } catch (error) {
+                showDebug(`Erro de login: ${error.code} - ${error.message}`);
+                console.error('Login error:', error);
+                
+                let errorMessage = 'Erro ao fazer login';
+                
+                switch (error.code) {
+                    case 'auth/user-not-found':
+                        errorMessage = 'Usuário não encontrado';
+                        break;
+                    case 'auth/wrong-password':
+                        errorMessage = 'Senha incorreta';
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessage = 'Email inválido';
+                        break;
+                    case 'auth/invalid-credential':
+                        errorMessage = 'Email ou senha incorretos';
+                        break;
+                    default:
+                        errorMessage = error.message;
+                }
+                
+                errorDiv.textContent = errorMessage;
+            } finally {
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Entrar';
+            }
+        };
+        
+        // Adicionar listener ao formulário
+        document.getElementById('loginForm').addEventListener('submit', window.handleLogin);
+    </script>
     
+    <!-- Script Principal -->
     <script>
         // Global variables
         let currentUser = null;
         let guardsListener = null;
         let spotsListener = null;
         let qrCodeInstance = null;
-        
-        // Initialize
-        window.onAuthStateChanged(window.auth, (user) => {
-            if (user) {
-                currentUser = user;
-                showDashboard();
-            } else {
-                showLogin();
-            }
-        });
-        
-        // Login
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            
-            try {
-                await window.signInWithEmailAndPassword(window.auth, email, password);
-                document.getElementById('loginError').textContent = '';
-            } catch (error) {
-                document.getElementById('loginError').textContent = 'Email ou senha incorretos';
-            }
-        });
-        
-        // Logout
-        function logout() {
-            window.signOut(window.auth);
-        }
         
         // Show/Hide screens
         function showLogin() {
@@ -580,6 +657,17 @@
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('dashboard').style.display = 'block';
             loadDashboard();
+        }
+        
+        // Logout
+        function logout() {
+            if (window.auth) {
+                window.signOut(window.auth).then(() => {
+                    console.log('Logout bem-sucedido');
+                }).catch((error) => {
+                    console.error('Erro ao fazer logout:', error);
+                });
+            }
         }
         
         // Tab switching
@@ -599,6 +687,7 @@
         
         // Load dashboard data
         async function loadDashboard() {
+            console.log('Carregando dashboard...');
             loadGuards();
             loadActiveSpots();
             loadStats();
@@ -608,12 +697,18 @@
         async function loadGuards() {
             const guardsList = document.getElementById('guardsList');
             
+            if (!window.db) {
+                guardsList.innerHTML = '<div class="empty-state">Erro: Firestore não inicializado</div>';
+                return;
+            }
+            
             try {
                 const guardsRef = window.collection(window.db, 'guards');
                 const snapshot = await window.getDocs(guardsRef);
                 
                 if (snapshot.empty) {
                     guardsList.innerHTML = '<div class="empty-state">Nenhum guardador cadastrado</div>';
+                    document.getElementById('activeGuards').textContent = '0';
                     return;
                 }
                 
@@ -658,13 +753,18 @@
                 document.getElementById('activeGuards').textContent = snapshot.size;
             } catch (error) {
                 console.error('Error loading guards:', error);
-                guardsList.innerHTML = '<div class="empty-state">Erro ao carregar guardadores</div>';
+                guardsList.innerHTML = `<div class="empty-state">Erro ao carregar guardadores: ${error.message}</div>`;
             }
         }
         
         // Add guard
         document.getElementById('guardForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            
+            if (!window.db) {
+                alert('Erro: Firestore não inicializado');
+                return;
+            }
             
             const guardData = {
                 name: document.getElementById('guardName').value,
@@ -682,7 +782,7 @@
                 alert('Guardador cadastrado com sucesso!');
             } catch (error) {
                 console.error('Error adding guard:', error);
-                alert('Erro ao cadastrar guardador');
+                alert('Erro ao cadastrar guardador: ' + error.message);
             }
         });
         
@@ -739,6 +839,11 @@
         // Load active spots
         async function loadActiveSpots() {
             const spotsList = document.getElementById('spotsList');
+            
+            if (!window.db) {
+                spotsList.innerHTML = '<div class="empty-state">Erro: Firestore não inicializado</div>';
+                return;
+            }
             
             try {
                 const spotsRef = window.collection(window.db, 'spots');
@@ -817,9 +922,14 @@
         async function loadHistory() {
             const historyList = document.getElementById('historyList');
             
+            if (!window.db) {
+                historyList.innerHTML = '<div class="empty-state">Erro: Firestore não inicializado</div>';
+                return;
+            }
+            
             try {
                 const spotsRef = window.collection(window.db, 'spots');
-                const q = window.query(spotsRef, window.where('active', '==', false), window.orderBy('endTime', 'desc'));
+                const q = window.query(spotsRef, window.where('active', '==', false));
                 const snapshot = await window.getDocs(q);
                 
                 if (snapshot.empty) {
@@ -872,6 +982,11 @@
         
         // Load reports
         async function loadReports() {
+            if (!window.db) {
+                console.error('Firestore não inicializado');
+                return;
+            }
+            
             try {
                 const spotsRef = window.collection(window.db, 'spots');
                 const snapshot = await window.getDocs(spotsRef);
@@ -968,29 +1083,43 @@
         
         // Load stats
         async function loadStats() {
+            if (!window.db) {
+                console.error('Firestore não inicializado');
+                return;
+            }
+            
             try {
                 // Today's revenue
                 const now = new Date();
                 const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
                 
                 const spotsRef = window.collection(window.db, 'spots');
-                const q = window.query(spotsRef, window.where('endTime', '>=', startOfDay));
-                const snapshot = await window.getDocs(q);
+                const snapshot = await window.getDocs(spotsRef);
                 
                 let todayRevenue = 0;
+                let todaySpots = 0;
+                
                 snapshot.forEach(doc => {
                     const spot = doc.data();
-                    if (spot.amount) {
+                    const endTime = spot.endTime?.toDate();
+                    
+                    if (endTime && endTime >= startOfDay && spot.amount) {
                         todayRevenue += spot.amount;
+                        todaySpots++;
                     }
                 });
                 
                 document.getElementById('todayRevenue').textContent = `R$ ${todayRevenue.toFixed(2)}`;
                 
                 // Total clients
-                const clientsRef = window.collection(window.db, 'clients');
-                const clientsSnapshot = await window.getDocs(clientsRef);
-                document.getElementById('totalClients').textContent = clientsSnapshot.size;
+                try {
+                    const clientsRef = window.collection(window.db, 'clients');
+                    const clientsSnapshot = await window.getDocs(clientsRef);
+                    document.getElementById('totalClients').textContent = clientsSnapshot.size;
+                } catch (error) {
+                    console.log('Coleção clients ainda não existe');
+                    document.getElementById('totalClients').textContent = '0';
+                }
             } catch (error) {
                 console.error('Error loading stats:', error);
             }
@@ -1046,7 +1175,7 @@
         
         // Auto-refresh active spots every 30 seconds
         setInterval(() => {
-            if (currentUser && document.getElementById('spots').classList.contains('active')) {
+            if (window.currentUser && document.getElementById('spots').classList.contains('active')) {
                 loadActiveSpots();
             }
         }, 30000);
