@@ -3,10 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flanelinha - Sistema de Gestão</title>
-    
-    <!-- QR Code Library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <title>Flanelinha - Conectando Guardadores e Motoristas</title>
     
     <style>
         * {
@@ -15,1170 +12,896 @@
             box-sizing: border-box;
         }
         
+        :root {
+            --primary-orange: #FF6B00;
+            --dark-orange: #E55A00;
+            --light-orange: #FFA500;
+            --dark-gray: #333333;
+            --medium-gray: #666666;
+            --light-gray: #F5F5F5;
+            --white: #FFFFFF;
+            --success: #4CAF50;
+            --shadow: rgba(0, 0, 0, 0.1);
+        }
+        
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: #f5f5f5;
-            color: #333;
+            line-height: 1.6;
+            color: var(--dark-gray);
+            overflow-x: hidden;
         }
         
-        /* Login Screen */
-        .login-container {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-        
-        .login-box {
-            background: white;
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 400px;
-        }
-        
-        .login-box h1 {
-            text-align: center;
-            margin-bottom: 2rem;
-            color: #333;
-        }
-        
-        .form-group {
-            margin-bottom: 1rem;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-        }
-        
-        .form-group input {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 1rem;
-        }
-        
-        .btn {
-            width: 100%;
-            padding: 0.75rem;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-        
-        .btn:hover {
-            background: #5a67d8;
-        }
-        
-        .btn:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-        }
-        
-        /* Dashboard */
-        .dashboard {
-            display: none;
-            min-height: 100vh;
-        }
-        
-        .header {
-            background: white;
-            padding: 1rem 2rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .header h1 {
-            color: #667eea;
-            font-size: 1.5rem;
-        }
-        
-        .header button {
-            padding: 0.5rem 1rem;
-            background: #ef4444;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-        
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-        
-        .stat-card {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        
-        .stat-card h3 {
-            color: #666;
-            font-size: 0.875rem;
-            margin-bottom: 0.5rem;
-        }
-        
-        .stat-card .value {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #333;
-        }
-        
-        .tabs {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            border-bottom: 2px solid #e5e7eb;
-        }
-        
-        .tab {
-            padding: 0.75rem 1.5rem;
-            background: none;
-            border: none;
-            font-size: 1rem;
-            cursor: pointer;
-            position: relative;
-            color: #666;
-        }
-        
-        .tab.active {
-            color: #667eea;
-        }
-        
-        .tab.active::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: #667eea;
-        }
-        
-        .content-area {
-            background: white;
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        
-        .section {
-            display: none;
-        }
-        
-        .section.active {
-            display: block;
-        }
-        
-        /* Forms */
-        .add-form {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-        
-        /* Tables */
-        .table-container {
-            overflow-x: auto;
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        
-        th, td {
-            text-align: left;
-            padding: 1rem;
-            border-bottom: 1px solid #e5e7eb;
-        }
-        
-        th {
-            font-weight: 600;
-            color: #666;
-        }
-        
-        .status-badge {
-            display: inline-block;
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
-            font-size: 0.875rem;
-            font-weight: 500;
-        }
-        
-        .status-active {
-            background: #10b981;
-            color: white;
-        }
-        
-        .status-inactive {
-            background: #ef4444;
-            color: white;
-        }
-        
-        /* QR Code Modal */
-        .modal {
-            display: none;
+        /* Header */
+        header {
+            background: var(--white);
+            box-shadow: 0 2px 10px var(--shadow);
             position: fixed;
+            width: 100%;
             top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            align-items: center;
-            justify-content: center;
             z-index: 1000;
         }
         
-        .modal-content {
-            background: white;
-            padding: 2rem;
-            border-radius: 10px;
-            max-width: 500px;
-            width: 90%;
-            text-align: center;
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 5%;
+            max-width: 1200px;
+            margin: 0 auto;
         }
         
-        .modal-content h2 {
-            margin-bottom: 1rem;
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-orange);
         }
         
-        #qrcode {
-            margin: 2rem auto;
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-orange);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-size: 1.5rem;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark-gray);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        .nav-links a:hover {
+            color: var(--primary-orange);
+        }
+        
+        .cta-button {
+            background: var(--primary-orange);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s;
             display: inline-block;
         }
         
-        .close-modal {
-            padding: 0.75rem 1.5rem;
-            background: #ef4444;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
+        .cta-button:hover {
+            background: var(--dark-orange);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 0, 0.3);
         }
         
-        /* Actions */
-        .actions {
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, var(--primary-orange) 0%, var(--dark-orange) 100%);
+            color: white;
+            padding: 120px 5% 80px;
+            min-height: 80vh;
             display: flex;
-            gap: 0.5rem;
+            align-items: center;
         }
         
-        .btn-small {
-            padding: 0.5rem 1rem;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.875rem;
+        .hero-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
         }
         
-        .btn-qr {
-            background: #3b82f6;
+        .hero-text h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+        
+        .hero-text p {
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+        
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .btn-white {
+            background: white;
+            color: var(--primary-orange);
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+        
+        .btn-white:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(255, 255, 255, 0.3);
+        }
+        
+        .btn-outline {
+            background: transparent;
             color: white;
+            border: 2px solid white;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s;
+            display: inline-block;
         }
         
-        .btn-edit {
-            background: #f59e0b;
-            color: white;
+        .btn-outline:hover {
+            background: white;
+            color: var(--primary-orange);
         }
         
-        .btn-delete {
-            background: #ef4444;
-            color: white;
+        .hero-image {
+            position: relative;
         }
         
-        .btn-end {
-            background: #10b981;
-            color: white;
+        .phone-mockup {
+            width: 300px;
+            height: 600px;
+            background: var(--dark-gray);
+            border-radius: 30px;
+            padding: 10px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            margin: 0 auto;
         }
         
-        /* Loading */
-        .loading {
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            background: var(--primary-orange);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5rem;
+            font-weight: bold;
+        }
+        
+        /* Problem Section */
+        .problem-section {
+            padding: 80px 5%;
+            background: var(--light-gray);
+        }
+        
+        .section-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .section-header {
             text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .section-header h2 {
+            font-size: 2.5rem;
+            color: var(--dark-gray);
+            margin-bottom: 1rem;
+        }
+        
+        .section-header p {
+            font-size: 1.25rem;
+            color: var(--medium-gray);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .problem-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+        
+        .problem-card {
+            background: white;
             padding: 2rem;
-            color: #666;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px var(--shadow);
+            transition: transform 0.3s;
         }
         
-        /* Empty State */
-        .empty-state {
+        .problem-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .problem-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--primary-orange);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            margin-bottom: 1rem;
+        }
+        
+        /* Solution Section */
+        .solution-section {
+            padding: 80px 5%;
+            background: white;
+        }
+        
+        .solution-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            margin-top: 3rem;
+        }
+        
+        .solution-diagram {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+        }
+        
+        .user-type {
             text-align: center;
-            padding: 3rem;
-            color: #666;
         }
         
-        /* Debug Info */
-        .debug-info {
-            background: #fef3c7;
-            border: 1px solid #f59e0b;
-            padding: 1rem;
-            margin: 1rem 0;
-            border-radius: 5px;
-            font-size: 0.875rem;
-            color: #92400e;
+        .user-icon {
+            width: 120px;
+            height: 120px;
+            background: var(--light-gray);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            font-size: 3rem;
+        }
+        
+        .guardador { background: #9C27B0; color: white; }
+        .app { background: var(--primary-orange); color: white; }
+        .usuarios { background: #2196F3; color: white; }
+        
+        /* Features Section */
+        .features-section {
+            padding: 80px 5%;
+            background: var(--light-gray);
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+        
+        .feature-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px var(--shadow);
+        }
+        
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--primary-orange);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 2rem;
+            color: white;
+        }
+        
+        /* Revenue Section */
+        .revenue-section {
+            padding: 80px 5%;
+            background: white;
+        }
+        
+        .revenue-split {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin-top: 3rem;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+        
+        .split-item {
+            text-align: center;
+        }
+        
+        .percentage {
+            font-size: 3rem;
+            font-weight: bold;
+            color: var(--primary-orange);
+        }
+        
+        .split-label {
+            font-size: 1.25rem;
+            color: var(--medium-gray);
+            margin-top: 0.5rem;
+        }
+        
+        /* CTA Section */
+        .cta-section {
+            background: linear-gradient(135deg, var(--primary-orange) 0%, var(--dark-orange) 100%);
+            color: white;
+            padding: 80px 5%;
+            text-align: center;
+        }
+        
+        .cta-content h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .cta-content p {
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+        
+        /* Footer */
+        footer {
+            background: var(--dark-gray);
+            color: white;
+            padding: 40px 5%;
+            text-align: center;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+        
+        .footer-links a:hover {
+            opacity: 1;
+        }
+        
+        /* Mobile Menu */
+        .mobile-menu-toggle {
+            display: none;
+            font-size: 1.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
         }
         
         /* Responsive */
         @media (max-width: 768px) {
-            .container {
-                padding: 1rem;
+            .nav-links {
+                display: none;
             }
             
-            .tabs {
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
+            .mobile-menu-toggle {
+                display: block;
             }
             
-            .add-form {
+            .hero-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            
+            .hero-text h1 {
+                font-size: 2rem;
+            }
+            
+            .phone-mockup {
+                width: 200px;
+                height: 400px;
+            }
+            
+            .solution-content {
                 grid-template-columns: 1fr;
             }
             
-            .stats-grid {
-                grid-template-columns: 1fr;
+            .solution-diagram {
+                flex-direction: column;
             }
+            
+            .revenue-split {
+                flex-direction: column;
+            }
+        }
+        
+        /* Animations */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        .float-animation {
+            animation: float 4s ease-in-out infinite;
         }
     </style>
 </head>
 <body>
-    <!-- Login Screen -->
-    <div class="login-container" id="loginScreen">
-        <div class="login-box">
-            <h1>🚗 Flanelinha</h1>
-            <form id="loginForm">
-                <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" id="email" value="admin@flanelinha.com.br" required>
+    <!-- Header -->
+    <header>
+        <nav>
+            <div class="logo">
+                <div class="logo-icon">F</div>
+                FLANELINHA
+            </div>
+            <div class="nav-links">
+                <a href="#problema">Problema</a>
+                <a href="#solucao">Solução</a>
+                <a href="#recursos">Recursos</a>
+                <a href="#associacoes">Para Associações</a>
+                <a href="#login" class="cta-button">Área Restrita</a>
+            </div>
+            <button class="mobile-menu-toggle">☰</button>
+        </nav>
+    </header>
+    
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1>Conectando Guardadores e Motoristas via WhatsApp</h1>
+                <p>A plataforma que moderniza e organiza o serviço de guardadores através do WhatsApp. Simples, rápido e seguro.</p>
+                <div class="hero-buttons">
+                    <a href="#cadastro" class="btn-white">Cadastre sua Associação</a>
+                    <a href="#como-funciona" class="btn-outline">Como Funciona</a>
                 </div>
-                <div class="form-group">
-                    <label>Senha</label>
-                    <input type="password" id="password" placeholder="Digite sua senha" required>
+            </div>
+            <div class="hero-image">
+                <div class="phone-mockup float-animation">
+                    <div class="phone-screen">F</div>
                 </div>
-                <button type="submit" class="btn" id="loginBtn">Entrar</button>
-            </form>
-            <div id="loginError" style="color: red; margin-top: 1rem; text-align: center;"></div>
-            <div id="debugInfo" class="debug-info" style="display: none; margin-top: 1rem;">
-                <strong>Debug Info:</strong>
-                <div id="debugContent"></div>
             </div>
         </div>
-    </div>
+    </section>
     
-    <!-- Dashboard -->
-    <div class="dashboard" id="dashboard">
-        <header class="header">
-            <h1>🚗 Flanelinha - Sistema de Gestão</h1>
-            <button onclick="logout()">Sair</button>
-        </header>
-        
-        <div class="container">
-            <!-- Stats -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <h3>Guardadores Ativos</h3>
-                    <div class="value" id="activeGuards">0</div>
+    <!-- Problem Section -->
+    <section id="problema" class="problem-section">
+        <div class="section-container">
+            <div class="section-header">
+                <h2>O Problema</h2>
+                <p>Milhares de guardadores trabalham nas ruas sem estrutura adequada, enquanto motoristas buscam segurança e praticidade.</p>
+            </div>
+            <div class="problem-grid">
+                <div class="problem-card">
+                    <div class="problem-icon">⚠️</div>
+                    <h3>Falta de Organização</h3>
+                    <p>Guardadores trabalham de forma independente, sem padronização ou controle de qualidade.</p>
                 </div>
-                <div class="stat-card">
-                    <h3>Vagas Ativas</h3>
-                    <div class="value" id="activeSpots">0</div>
+                <div class="problem-card">
+                    <div class="problem-icon">💰</div>
+                    <h3>Pagamento Informal</h3>
+                    <p>Transações em dinheiro dificultam o controle e aumentam riscos para ambas as partes.</p>
                 </div>
-                <div class="stat-card">
-                    <h3>Faturamento Hoje</h3>
-                    <div class="value" id="todayRevenue">R$ 0,00</div>
+                <div class="problem-card">
+                    <div class="problem-icon">🚗</div>
+                    <h3>Insegurança</h3>
+                    <p>Motoristas não têm garantia sobre a confiabilidade do guardador ou do serviço prestado.</p>
                 </div>
-                <div class="stat-card">
-                    <h3>Total de Clientes</h3>
-                    <div class="value" id="totalClients">0</div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- How It Works Section -->
+    <section id="como-funciona" class="solution-section">
+        <div class="section-container">
+            <div class="section-header">
+                <h2>Como Funciona para Cada Usuário</h2>
+                <p>Sistema simples e eficiente para todos os envolvidos.</p>
+            </div>
+            
+            <!-- For Clients -->
+            <div style="margin-top: 3rem;">
+                <h3 style="color: var(--primary-orange); margin-bottom: 2rem;">Para Motoristas</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; text-align: center;">
+                    <div>
+                        <div class="feature-icon">📱</div>
+                        <h4>1. Escaneie o QR</h4>
+                        <p>QR Code do guardador com o celular</p>
+                    </div>
+                    <div>
+                        <div class="feature-icon">💬</div>
+                        <h4>2. WhatsApp Abre</h4>
+                        <p>Conversa automática com o bot</p>
+                    </div>
+                    <div>
+                        <div class="feature-icon">🚗</div>
+                        <h4>3. Inicie a Vaga</h4>
+                        <p>Confirme veículo e pronto</p>
+                    </div>
+                    <div>
+                        <div class="feature-icon">💳</div>
+                        <h4>4. Pague pelo WhatsApp</h4>
+                        <p>PIX ou cartão direto no chat</p>
+                    </div>
                 </div>
             </div>
             
-            <!-- Tabs -->
-            <div class="tabs">
-                <button class="tab active" onclick="switchTab('guards')">Guardadores</button>
-                <button class="tab" onclick="switchTab('spots')">Vagas Ativas</button>
-                <button class="tab" onclick="switchTab('history')">Histórico</button>
-                <button class="tab" onclick="switchTab('reports')">Relatórios</button>
+            <!-- For Guards -->
+            <div style="margin-top: 4rem;">
+                <h3 style="color: var(--primary-orange); margin-bottom: 2rem;">Para Guardadores</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; text-align: center;">
+                    <div>
+                        <div class="feature-icon">✅</div>
+                        <h4>1. Seja Cadastrado</h4>
+                        <p>Pela sua associação</p>
+                    </div>
+                    <div>
+                        <div class="feature-icon">🔐</div>
+                        <h4>2. Acesse o Sistema</h4>
+                        <p>Login com CPF e senha</p>
+                    </div>
+                    <div>
+                        <div class="feature-icon">📊</div>
+                        <h4>3. Veja seus Ganhos</h4>
+                        <p>Acompanhe em tempo real</p>
+                    </div>
+                    <div>
+                        <div class="feature-icon">🎯</div>
+                        <h4>4. Imprima seu QR</h4>
+                        <p>Use no dia a dia</p>
+                    </div>
+                </div>
             </div>
             
-            <!-- Content -->
-            <div class="content-area">
-                <!-- Guards Section -->
-                <div id="guards" class="section active">
-                    <h2>Cadastro de Guardadores</h2>
-                    <form id="guardForm" class="add-form">
-                        <div class="form-group">
-                            <input type="text" id="guardName" placeholder="Nome completo" required>
-                        </div>
-                        <div class="form-group">
-                            <input type="text" id="guardCpf" placeholder="CPF" required>
-                        </div>
-                        <div class="form-group">
-                            <input type="text" id="guardPhone" placeholder="WhatsApp" required>
-                        </div>
-                        <div class="form-group">
-                            <input type="text" id="guardArea" placeholder="Área de atuação" required>
-                        </div>
-                        <div class="form-group">
-                            <input type="text" id="guardPix" placeholder="Chave PIX" required>
-                        </div>
-                        <button type="submit" class="btn">Cadastrar Guardador</button>
-                    </form>
-                    
-                    <div id="guardsList" class="table-container">
-                        <div class="loading">Carregando guardadores...</div>
+            <!-- For Associations -->
+            <div style="margin-top: 4rem;">
+                <h3 style="color: var(--primary-orange); margin-bottom: 2rem;">Para Associações</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; text-align: center;">
+                    <div>
+                        <div class="feature-icon">📝</div>
+                        <h4>1. Cadastre-se</h4>
+                        <p>Aguarde aprovação</p>
                     </div>
-                </div>
-                
-                <!-- Active Spots Section -->
-                <div id="spots" class="section">
-                    <h2>Vagas Ativas</h2>
-                    <div id="spotsList" class="table-container">
-                        <div class="loading">Carregando vagas...</div>
+                    <div>
+                        <div class="feature-icon">👥</div>
+                        <h4>2. Gerencie Guardadores</h4>
+                        <p>Cadastre e monitore</p>
                     </div>
-                </div>
-                
-                <!-- History Section -->
-                <div id="history" class="section">
-                    <h2>Histórico de Vagas</h2>
-                    <div id="historyList" class="table-container">
-                        <div class="loading">Carregando histórico...</div>
+                    <div>
+                        <div class="feature-icon">📈</div>
+                        <h4>3. Relatórios</h4>
+                        <p>Acompanhe o desempenho</p>
                     </div>
-                </div>
-                
-                <!-- Reports Section -->
-                <div id="reports" class="section">
-                    <h2>Relatórios</h2>
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <h3>Faturamento Mensal</h3>
-                            <div class="value" id="monthRevenue">R$ 0,00</div>
-                        </div>
-                        <div class="stat-card">
-                            <h3>Ticket Médio</h3>
-                            <div class="value" id="avgTicket">R$ 0,00</div>
-                        </div>
-                        <div class="stat-card">
-                            <h3>Total de Vagas</h3>
-                            <div class="value" id="totalSpots">0</div>
-                        </div>
-                        <div class="stat-card">
-                            <h3>Gorjeta Média</h3>
-                            <div class="value" id="avgTip">R$ 0,00</div>
-                        </div>
-                    </div>
-                    
-                    <h3 style="margin-top: 2rem;">Top Guardadores</h3>
-                    <div id="topGuards" class="table-container">
-                        <div class="loading">Carregando relatório...</div>
+                    <div>
+                        <div class="feature-icon">💰</div>
+                        <h4>4. Receba Comissão</h4>
+                        <p>3% de cada transação</p>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-    
-    <!-- QR Code Modal -->
-    <div id="qrModal" class="modal">
-        <div class="modal-content">
-            <h2 id="qrTitle">QR Code do Guardador</h2>
-            <div id="qrcode"></div>
-            <p id="qrInfo" style="margin-bottom: 1rem;"></p>
-            <button class="close-modal" onclick="closeQRModal()">Fechar</button>
-        </div>
-    </div>
+    </section>
 
-    <!-- Firebase SDK v9 - Script Separado -->
+    <!-- Login Section -->
+    <section id="login" class="problem-section">
+        <div class="section-container">
+            <div class="section-header">
+                <h2>Área Restrita</h2>
+                <p>Acesso exclusivo para associações e guardadores cadastrados.</p>
+            </div>
+            <div style="max-width: 400px; margin: 0 auto; background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 5px 20px var(--shadow);">
+                <form id="loginForm">
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">CPF ou E-mail</label>
+                        <input type="text" id="loginUser" placeholder="Digite seu CPF ou e-mail" required style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px;">
+                    </div>
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Senha</label>
+                        <input type="password" id="loginPassword" placeholder="Digite sua senha" required style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px;">
+                    </div>
+                    <button type="submit" style="width: 100%; background: var(--primary-orange); color: white; padding: 1rem; border: none; border-radius: 5px; font-size: 1.1rem; font-weight: bold; cursor: pointer;">Entrar</button>
+                </form>
+                <div style="margin-top: 1rem; text-align: center;">
+                    <a href="#" style="color: var(--primary-orange); text-decoration: none;">Esqueci minha senha</a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Features Section -->
+    <section id="recursos" class="features-section">
+        <div class="section-container">
+            <div class="section-header">
+                <h2>Recursos da Plataforma</h2>
+                <p>Tudo que você precisa para modernizar o serviço de guardadores.</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">💬</div>
+                    <h3>Tudo via WhatsApp</h3>
+                    <p>Motoristas usam apenas WhatsApp. Sem necessidade de baixar apps.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">💳</div>
+                    <h3>Pagamento Digital</h3>
+                    <p>PIX, cartão de crédito e débito. Divisão automática entre guardador, associação e plataforma.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⭐</div>
+                    <h3>Sistema de Avaliação</h3>
+                    <p>Motoristas avaliam guardadores, garantindo qualidade e confiabilidade do serviço.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>Relatórios Completos</h3>
+                    <p>Dashboard com métricas, faturamento e performance para associações e guardadores.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3>Segurança Total</h3>
+                    <p>Cadastros verificados, histórico de atendimentos e suporte 24/7.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🗺️</div>
+                    <h3>Geolocalização</h3>
+                    <p>Encontre guardadores próximos e acompanhe em tempo real.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Revenue Section -->
+    <section class="revenue-section">
+        <div class="section-container">
+            <div class="section-header">
+                <h2>Divisão Transparente</h2>
+                <p>Sistema justo de divisão que beneficia todos os envolvidos.</p>
+            </div>
+            <div class="revenue-split">
+                <div class="split-item">
+                    <div class="percentage">85%</div>
+                    <div class="split-label">Guardador</div>
+                </div>
+                <div class="split-item">
+                    <div class="percentage">12%</div>
+                    <div class="split-label">Flanelinha</div>
+                </div>
+                <div class="split-item">
+                    <div class="percentage">3%</div>
+                    <div class="split-label">Associação</div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- CTA Section -->
+    <section id="cadastro" class="cta-section">
+        <div class="cta-content">
+            <h2>Faça Parte da Revolução</h2>
+            <p>Cadastre sua associação e comece a transformar o trabalho dos guardadores da sua região.</p>
+            <a href="#form-associacao" class="btn-white">Cadastrar Associação</a>
+        </div>
+    </section>
+    
+    <!-- Association Form Section -->
+    <section id="form-associacao" class="problem-section">
+        <div class="section-container">
+            <div class="section-header">
+                <h2>Cadastro de Associação</h2>
+                <p>Preencha o formulário e aguarde nossa aprovação.</p>
+            </div>
+            <form style="max-width: 600px; margin: 0 auto; background: white; padding: 2rem; border-radius: 10px;">
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Nome da Associação</label>
+                    <input type="text" placeholder="Ex: Associação dos Guardadores do Centro" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px;">
+                </div>
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">CNPJ</label>
+                    <input type="text" placeholder="00.000.000/0000-00" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px;">
+                </div>
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Responsável</label>
+                    <input type="text" placeholder="Nome completo" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px;">
+                </div>
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">E-mail</label>
+                    <input type="email" placeholder="contato@associacao.com.br" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px;">
+                </div>
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">WhatsApp</label>
+                    <input type="tel" placeholder="(00) 00000-0000" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px;">
+                </div>
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Cidade/Estado</label>
+                    <input type="text" placeholder="Ex: Belém/PA" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px;">
+                </div>
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Quantidade de Guardadores</label>
+                    <select style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px;">
+                        <option>Selecione</option>
+                        <option>1-10 guardadores</option>
+                        <option>11-30 guardadores</option>
+                        <option>31-50 guardadores</option>
+                        <option>Mais de 50 guardadores</option>
+                    </select>
+                </div>
+                <button type="submit" style="width: 100%; background: var(--primary-orange); color: white; padding: 1rem; border: none; border-radius: 5px; font-size: 1.1rem; font-weight: bold; cursor: pointer;">Enviar Cadastro</button>
+            </form>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="#sobre">Sobre</a>
+                <a href="#termos">Termos de Uso</a>
+                <a href="#privacidade">Privacidade</a>
+                <a href="#contato">Contato</a>
+                <a href="#suporte">Suporte</a>
+            </div>
+            <p>&copy; 2024 Flanelinha Ltda. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+    
+    <!-- Firebase Integration Script -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, doc, query, where, orderBy, serverTimestamp, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
-
-        // Debug info
-        const debugDiv = document.getElementById('debugInfo');
-        const debugContent = document.getElementById('debugContent');
+        import { getFirestore, collection, addDoc, serverTimestamp, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
         
-        function showDebug(message) {
-            debugDiv.style.display = 'block';
-            debugContent.innerHTML += `<div>${new Date().toLocaleTimeString()}: ${message}</div>`;
-        }
-
-        try {
-            showDebug('Iniciando configuração do Firebase...');
-            
-            const firebaseConfig = {
-                apiKey: "AIzaSyBIRb8Y7ct6wBxeMQ86foRT1s3E2FC8QVY",
-                authDomain: "flanelinha-ltda.firebaseapp.com",
-                projectId: "flanelinha-ltda",
-                storageBucket: "flanelinha-ltda.firebasestorage.app",
-                messagingSenderId: "396982431821",
-                appId: "1:396982431821:web:fbdcbbc22c9bcde83bac04"
-            };
-
-            const app = initializeApp(firebaseConfig);
-            const auth = getAuth(app);
-            const db = getFirestore(app);
-            
-            showDebug('Firebase inicializado com sucesso!');
-
-            // Expor para o escopo global
-            window.firebaseApp = app;
-            window.auth = auth;
-            window.db = db;
-            
-            // Expor funções necessárias
-            window.signInWithEmailAndPassword = signInWithEmailAndPassword;
-            window.onAuthStateChanged = onAuthStateChanged;
-            window.signOut = signOut;
-            window.collection = collection;
-            window.addDoc = addDoc;
-            window.getDocs = getDocs;
-            window.doc = doc;
-            window.query = query;
-            window.where = where;
-            window.orderBy = orderBy;
-            window.serverTimestamp = serverTimestamp;
-            window.updateDoc = updateDoc;
-            window.deleteDoc = deleteDoc;
-            
-            showDebug('Funções exportadas para window');
-            
-            // Inicializar listeners de autenticação
-            initializeAuth();
-            
-        } catch (error) {
-            showDebug(`Erro ao inicializar Firebase: ${error.message}`);
-            console.error('Firebase initialization error:', error);
-        }
-        
-        function initializeAuth() {
-            showDebug('Configurando listener de autenticação...');
-            
-            onAuthStateChanged(auth, (user) => {
-                if (user) {
-                    showDebug(`Usuário autenticado: ${user.email}`);
-                    window.currentUser = user;
-                    showDashboard();
-                } else {
-                    showDebug('Usuário não autenticado');
-                    window.currentUser = null;
-                    showLogin();
-                }
-            });
-        }
-        
-        // Função de login
-        window.handleLogin = async function(e) {
-            e.preventDefault();
-            
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const loginBtn = document.getElementById('loginBtn');
-            const errorDiv = document.getElementById('loginError');
-            
-            showDebug(`Tentando login com: ${email}`);
-            
-            loginBtn.disabled = true;
-            loginBtn.textContent = 'Entrando...';
-            errorDiv.textContent = '';
-            
-            try {
-                const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                showDebug(`Login bem-sucedido: ${userCredential.user.email}`);
-                errorDiv.textContent = '';
-            } catch (error) {
-                showDebug(`Erro de login: ${error.code} - ${error.message}`);
-                console.error('Login error:', error);
-                
-                let errorMessage = 'Erro ao fazer login';
-                
-                switch (error.code) {
-                    case 'auth/user-not-found':
-                        errorMessage = 'Usuário não encontrado';
-                        break;
-                    case 'auth/wrong-password':
-                        errorMessage = 'Senha incorreta';
-                        break;
-                    case 'auth/invalid-email':
-                        errorMessage = 'Email inválido';
-                        break;
-                    case 'auth/invalid-credential':
-                        errorMessage = 'Email ou senha incorretos';
-                        break;
-                    default:
-                        errorMessage = error.message;
-                }
-                
-                errorDiv.textContent = errorMessage;
-            } finally {
-                loginBtn.disabled = false;
-                loginBtn.textContent = 'Entrar';
-            }
+        const firebaseConfig = {
+            apiKey: "AIzaSyBIRb8Y7ct6wBxeMQ86foRT1s3E2FC8QVY",
+            authDomain: "flanelinha-ltda.firebaseapp.com",
+            projectId: "flanelinha-ltda",
+            storageBucket: "flanelinha-ltda.firebasestorage.app",
+            messagingSenderId: "396982431821",
+            appId: "1:396982431821:web:fbdcbbc22c9bcde83bac04"
         };
         
-        // Adicionar listener ao formulário
-        document.getElementById('loginForm').addEventListener('submit', window.handleLogin);
-    </script>
-    
-    <!-- Script Principal -->
-    <script>
-        // Global variables
-        let currentUser = null;
-        let guardsListener = null;
-        let spotsListener = null;
-        let qrCodeInstance = null;
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
         
-        // Show/Hide screens
-        function showLogin() {
-            document.getElementById('loginScreen').style.display = 'flex';
-            document.getElementById('dashboard').style.display = 'none';
-            if (guardsListener) guardsListener();
-            if (spotsListener) spotsListener();
-        }
-        
-        function showDashboard() {
-            document.getElementById('loginScreen').style.display = 'none';
-            document.getElementById('dashboard').style.display = 'block';
-            loadDashboard();
-        }
-        
-        // Logout
-        function logout() {
-            if (window.auth) {
-                window.signOut(window.auth).then(() => {
-                    console.log('Logout bem-sucedido');
-                }).catch((error) => {
-                    console.error('Erro ao fazer logout:', error);
-                });
-            }
-        }
-        
-        // Tab switching
-        function switchTab(tabName) {
-            // Update tabs
-            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            // Update sections
-            document.querySelectorAll('.section').forEach(section => section.classList.remove('active'));
-            document.getElementById(tabName).classList.add('active');
-            
-            // Load data for the tab
-            if (tabName === 'history') loadHistory();
-            if (tabName === 'reports') loadReports();
-        }
-        
-        // Load dashboard data
-        async function loadDashboard() {
-            console.log('Carregando dashboard...');
-            loadGuards();
-            loadActiveSpots();
-            loadStats();
-        }
-        
-        // Load guards
-        async function loadGuards() {
-            const guardsList = document.getElementById('guardsList');
-            
-            if (!window.db) {
-                guardsList.innerHTML = '<div class="empty-state">Erro: Firestore não inicializado</div>';
-                return;
-            }
-            
-            try {
-                const guardsRef = window.collection(window.db, 'guards');
-                const snapshot = await window.getDocs(guardsRef);
-                
-                if (snapshot.empty) {
-                    guardsList.innerHTML = '<div class="empty-state">Nenhum guardador cadastrado</div>';
-                    document.getElementById('activeGuards').textContent = '0';
-                    return;
-                }
-                
-                let html = `
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Nome</th>
-                                <th>CPF</th>
-                                <th>WhatsApp</th>
-                                <th>Área</th>
-                                <th>Status</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                `;
-                
-                snapshot.forEach(doc => {
-                    const guard = doc.data();
-                    html += `
-                        <tr>
-                            <td>${guard.name}</td>
-                            <td>${formatCPF(guard.cpf)}</td>
-                            <td>${guard.phone}</td>
-                            <td>${guard.area}</td>
-                            <td><span class="status-badge status-active">Ativo</span></td>
-                            <td>
-                                <div class="actions">
-                                    <button class="btn-small btn-qr" onclick="showQRCode('${doc.id}', '${guard.name}')">QR Code</button>
-                                    <button class="btn-small btn-delete" onclick="deleteGuard('${doc.id}')">Excluir</button>
-                                </div>
-                            </td>
-                        </tr>
-                    `;
-                });
-                
-                html += '</tbody></table>';
-                guardsList.innerHTML = html;
-                
-                // Update stats
-                document.getElementById('activeGuards').textContent = snapshot.size;
-            } catch (error) {
-                console.error('Error loading guards:', error);
-                guardsList.innerHTML = `<div class="empty-state">Erro ao carregar guardadores: ${error.message}</div>`;
-            }
-        }
-        
-        // Add guard
-        document.getElementById('guardForm').addEventListener('submit', async (e) => {
+        // Handle association form submission
+        document.querySelector('#form-associacao form').addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            if (!window.db) {
-                alert('Erro: Firestore não inicializado');
-                return;
-            }
-            
-            const guardData = {
-                name: document.getElementById('guardName').value,
-                cpf: document.getElementById('guardCpf').value.replace(/\D/g, ''),
-                phone: document.getElementById('guardPhone').value,
-                area: document.getElementById('guardArea').value,
-                pix: document.getElementById('guardPix').value,
-                createdAt: window.serverTimestamp()
+            const formData = {
+                nome: e.target[0].value,
+                cnpj: e.target[1].value,
+                responsavel: e.target[2].value,
+                email: e.target[3].value,
+                whatsapp: e.target[4].value,
+                cidade: e.target[5].value,
+                quantidadeGuardadores: e.target[6].value,
+                status: 'pendente',
+                createdAt: serverTimestamp()
             };
             
             try {
-                await window.addDoc(window.collection(window.db, 'guards'), guardData);
-                document.getElementById('guardForm').reset();
-                loadGuards();
-                alert('Guardador cadastrado com sucesso!');
+                await addDoc(collection(db, 'associacoes_pendentes'), formData);
+                alert('Cadastro enviado com sucesso! Entraremos em contato em breve.');
+                e.target.reset();
             } catch (error) {
-                console.error('Error adding guard:', error);
-                alert('Erro ao cadastrar guardador: ' + error.message);
+                console.error('Erro ao enviar cadastro:', error);
+                alert('Erro ao enviar cadastro. Tente novamente.');
             }
         });
         
-        // Delete guard
-        async function deleteGuard(guardId) {
-            if (!confirm('Tem certeza que deseja excluir este guardador?')) return;
+        // Handle login form
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const userInput = document.getElementById('loginUser').value;
+            const password = document.getElementById('loginPassword').value;
             
             try {
-                await window.deleteDoc(window.doc(window.db, 'guards', guardId));
-                loadGuards();
-                alert('Guardador excluído com sucesso!');
+                let email = userInput;
+                
+                // Check if input is CPF
+                if (/^\d{11}$/.test(userInput.replace(/\D/g, ''))) {
+                    // Search for user by CPF
+                    const cpfClean = userInput.replace(/\D/g, '');
+                    
+                    // First check guardadores
+                    const guardsQuery = query(collection(db, 'guards'), where('cpf', '==', cpfClean));
+                    const guardsSnapshot = await getDocs(guardsQuery);
+                    
+                    if (!guardsSnapshot.empty) {
+                        const guardData = guardsSnapshot.docs[0].data();
+                        email = guardData.email || `${cpfClean}@flanelinha.com.br`;
+                    } else {
+                        // Check associations
+                        const assocQuery = query(collection(db, 'associations'), where('cnpj', '==', cpfClean));
+                        const assocSnapshot = await getDocs(assocQuery);
+                        
+                        if (!assocSnapshot.empty) {
+                            const assocData = assocSnapshot.docs[0].data();
+                            email = assocData.email;
+                        }
+                    }
+                }
+                
+                // Try to login
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                
+                // Redirect to dashboard
+                window.location.href = 'dashboard.html';
+                
             } catch (error) {
-                console.error('Error deleting guard:', error);
-                alert('Erro ao excluir guardador');
+                console.error('Login error:', error);
+                alert('CPF/E-mail ou senha incorretos');
             }
-        }
+        });
         
-        // Show QR Code
-        function showQRCode(guardId, guardName) {
-            const modal = document.getElementById('qrModal');
-            const qrDiv = document.getElementById('qrcode');
-            
-            // Clear previous QR code
-            qrDiv.innerHTML = '';
-            
-            // Generate WhatsApp link
-            const whatsappNumber = '5591982892700'; // Número do bot
-            const message = `GUARD:${guardId}`;
-            const whatsappLink = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-            
-            // Create QR code
-            qrCodeInstance = new QRCode(qrDiv, {
-                text: whatsappLink,
-                width: 256,
-                height: 256,
-                colorDark: "#000000",
-                colorLight: "#ffffff",
-                correctLevel: QRCode.CorrectLevel.H
+        // Smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
             });
-            
-            // Update modal info
-            document.getElementById('qrTitle').textContent = `QR Code - ${guardName}`;
-            document.getElementById('qrInfo').textContent = 'Cliente escaneia para iniciar vaga';
-            
-            // Show modal
-            modal.style.display = 'flex';
-        }
-        
-        // Close QR Modal
-        function closeQRModal() {
-            document.getElementById('qrModal').style.display = 'none';
-        }
-        
-        // Load active spots
-        async function loadActiveSpots() {
-            const spotsList = document.getElementById('spotsList');
-            
-            if (!window.db) {
-                spotsList.innerHTML = '<div class="empty-state">Erro: Firestore não inicializado</div>';
-                return;
-            }
-            
-            try {
-                const spotsRef = window.collection(window.db, 'spots');
-                const q = window.query(spotsRef, window.where('active', '==', true));
-                const snapshot = await window.getDocs(q);
-                
-                if (snapshot.empty) {
-                    spotsList.innerHTML = '<div class="empty-state">Nenhuma vaga ativa no momento</div>';
-                    document.getElementById('activeSpots').textContent = '0';
-                    return;
-                }
-                
-                let html = `
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Cliente</th>
-                                <th>Veículo</th>
-                                <th>Guardador</th>
-                                <th>Início</th>
-                                <th>Tempo</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                `;
-                
-                snapshot.forEach(doc => {
-                    const spot = doc.data();
-                    const startTime = spot.startTime?.toDate() || new Date();
-                    const duration = calculateDuration(startTime);
-                    
-                    html += `
-                        <tr>
-                            <td>${spot.clientName || 'Cliente'}<br><small>${spot.clientPhone}</small></td>
-                            <td>${spot.vehicle || 'Não informado'}</td>
-                            <td>${spot.guardName}</td>
-                            <td>${formatTime(startTime)}</td>
-                            <td>${duration}</td>
-                            <td>
-                                <button class="btn-small btn-end" onclick="endSpot('${doc.id}')">Encerrar</button>
-                            </td>
-                        </tr>
-                    `;
-                });
-                
-                html += '</tbody></table>';
-                spotsList.innerHTML = html;
-                
-                // Update stats
-                document.getElementById('activeSpots').textContent = snapshot.size;
-            } catch (error) {
-                console.error('Error loading spots:', error);
-                spotsList.innerHTML = '<div class="empty-state">Erro ao carregar vagas</div>';
-            }
-        }
-        
-        // End spot
-        async function endSpot(spotId) {
-            if (!confirm('Tem certeza que deseja encerrar esta vaga?')) return;
-            
-            try {
-                await window.updateDoc(window.doc(window.db, 'spots', spotId), {
-                    active: false,
-                    endTime: window.serverTimestamp()
-                });
-                loadActiveSpots();
-                alert('Vaga encerrada com sucesso!');
-            } catch (error) {
-                console.error('Error ending spot:', error);
-                alert('Erro ao encerrar vaga');
-            }
-        }
-        
-        // Load history
-        async function loadHistory() {
-            const historyList = document.getElementById('historyList');
-            
-            if (!window.db) {
-                historyList.innerHTML = '<div class="empty-state">Erro: Firestore não inicializado</div>';
-                return;
-            }
-            
-            try {
-                const spotsRef = window.collection(window.db, 'spots');
-                const q = window.query(spotsRef, window.where('active', '==', false));
-                const snapshot = await window.getDocs(q);
-                
-                if (snapshot.empty) {
-                    historyList.innerHTML = '<div class="empty-state">Nenhum histórico disponível</div>';
-                    return;
-                }
-                
-                let html = `
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Data</th>
-                                <th>Cliente</th>
-                                <th>Veículo</th>
-                                <th>Guardador</th>
-                                <th>Duração</th>
-                                <th>Valor</th>
-                                <th>Gorjeta</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                `;
-                
-                snapshot.forEach(doc => {
-                    const spot = doc.data();
-                    const startTime = spot.startTime?.toDate();
-                    const endTime = spot.endTime?.toDate();
-                    const duration = startTime && endTime ? calculateDurationBetween(startTime, endTime) : 'N/A';
-                    
-                    html += `
-                        <tr>
-                            <td>${formatDate(endTime)}</td>
-                            <td>${spot.clientName || 'Cliente'}<br><small>${spot.clientPhone}</small></td>
-                            <td>${spot.vehicle || 'Não informado'}</td>
-                            <td>${spot.guardName}</td>
-                            <td>${duration}</td>
-                            <td>R$ ${(spot.amount || 0).toFixed(2)}</td>
-                            <td>R$ ${(spot.tipAmount || 0).toFixed(2)}</td>
-                        </tr>
-                    `;
-                });
-                
-                html += '</tbody></table>';
-                historyList.innerHTML = html;
-            } catch (error) {
-                console.error('Error loading history:', error);
-                historyList.innerHTML = '<div class="empty-state">Erro ao carregar histórico</div>';
-            }
-        }
-        
-        // Load reports
-        async function loadReports() {
-            if (!window.db) {
-                console.error('Firestore não inicializado');
-                return;
-            }
-            
-            try {
-                const spotsRef = window.collection(window.db, 'spots');
-                const snapshot = await window.getDocs(spotsRef);
-                
-                let totalRevenue = 0;
-                let totalTips = 0;
-                let completedSpots = 0;
-                let guardStats = {};
-                
-                const now = new Date();
-                const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-                let monthRevenue = 0;
-                
-                snapshot.forEach(doc => {
-                    const spot = doc.data();
-                    if (!spot.active && spot.amount) {
-                        totalRevenue += spot.amount;
-                        completedSpots++;
-                        
-                        if (spot.tipAmount) {
-                            totalTips += spot.tipAmount;
-                        }
-                        
-                        // Check if from this month
-                        const endTime = spot.endTime?.toDate();
-                        if (endTime && endTime >= startOfMonth) {
-                            monthRevenue += spot.amount;
-                        }
-                        
-                        // Guard stats
-                        if (spot.guardName) {
-                            if (!guardStats[spot.guardName]) {
-                                guardStats[spot.guardName] = {
-                                    spots: 0,
-                                    revenue: 0,
-                                    tips: 0
-                                };
-                            }
-                            guardStats[spot.guardName].spots++;
-                            guardStats[spot.guardName].revenue += spot.amount;
-                            guardStats[spot.guardName].tips += (spot.tipAmount || 0);
-                        }
-                    }
-                });
-                
-                // Update stats
-                document.getElementById('monthRevenue').textContent = `R$ ${monthRevenue.toFixed(2)}`;
-                document.getElementById('avgTicket').textContent = completedSpots > 0 ? `R$ ${(totalRevenue / completedSpots).toFixed(2)}` : 'R$ 0,00';
-                document.getElementById('totalSpots').textContent = snapshot.size;
-                document.getElementById('avgTip').textContent = completedSpots > 0 ? `R$ ${(totalTips / completedSpots).toFixed(2)}` : 'R$ 0,00';
-                
-                // Top guards
-                const topGuardsDiv = document.getElementById('topGuards');
-                const sortedGuards = Object.entries(guardStats).sort((a, b) => b[1].revenue - a[1].revenue);
-                
-                if (sortedGuards.length === 0) {
-                    topGuardsDiv.innerHTML = '<div class="empty-state">Nenhum dado disponível</div>';
-                    return;
-                }
-                
-                let html = `
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Guardador</th>
-                                <th>Vagas</th>
-                                <th>Faturamento</th>
-                                <th>Gorjetas</th>
-                                <th>Média/Vaga</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                `;
-                
-                sortedGuards.slice(0, 10).forEach(([name, stats]) => {
-                    const avgPerSpot = stats.revenue / stats.spots;
-                    html += `
-                        <tr>
-                            <td>${name}</td>
-                            <td>${stats.spots}</td>
-                            <td>R$ ${stats.revenue.toFixed(2)}</td>
-                            <td>R$ ${stats.tips.toFixed(2)}</td>
-                            <td>R$ ${avgPerSpot.toFixed(2)}</td>
-                        </tr>
-                    `;
-                });
-                
-                html += '</tbody></table>';
-                topGuardsDiv.innerHTML = html;
-            } catch (error) {
-                console.error('Error loading reports:', error);
-            }
-        }
-        
-        // Load stats
-        async function loadStats() {
-            if (!window.db) {
-                console.error('Firestore não inicializado');
-                return;
-            }
-            
-            try {
-                // Today's revenue
-                const now = new Date();
-                const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-                
-                const spotsRef = window.collection(window.db, 'spots');
-                const snapshot = await window.getDocs(spotsRef);
-                
-                let todayRevenue = 0;
-                let todaySpots = 0;
-                
-                snapshot.forEach(doc => {
-                    const spot = doc.data();
-                    const endTime = spot.endTime?.toDate();
-                    
-                    if (endTime && endTime >= startOfDay && spot.amount) {
-                        todayRevenue += spot.amount;
-                        todaySpots++;
-                    }
-                });
-                
-                document.getElementById('todayRevenue').textContent = `R$ ${todayRevenue.toFixed(2)}`;
-                
-                // Total clients
-                try {
-                    const clientsRef = window.collection(window.db, 'clients');
-                    const clientsSnapshot = await window.getDocs(clientsRef);
-                    document.getElementById('totalClients').textContent = clientsSnapshot.size;
-                } catch (error) {
-                    console.log('Coleção clients ainda não existe');
-                    document.getElementById('totalClients').textContent = '0';
-                }
-            } catch (error) {
-                console.error('Error loading stats:', error);
-            }
-        }
-        
-        // Utility functions
-        function formatCPF(cpf) {
-            if (!cpf) return '';
-            return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
-        }
-        
-        function formatDate(date) {
-            if (!date) return 'N/A';
-            return new Intl.DateTimeFormat('pt-BR', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            }).format(date);
-        }
-        
-        function formatTime(date) {
-            if (!date) return 'N/A';
-            return new Intl.DateTimeFormat('pt-BR', {
-                hour: '2-digit',
-                minute: '2-digit'
-            }).format(date);
-        }
-        
-        function calculateDuration(startTime) {
-            const now = new Date();
-            const diff = now - startTime;
-            const hours = Math.floor(diff / (1000 * 60 * 60));
-            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            
-            if (hours > 0) {
-                return `${hours}h ${minutes}min`;
-            }
-            return `${minutes}min`;
-        }
-        
-        function calculateDurationBetween(startTime, endTime) {
-            const diff = endTime - startTime;
-            const hours = Math.floor(diff / (1000 * 60 * 60));
-            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            
-            if (hours > 0) {
-                return `${hours}h ${minutes}min`;
-            }
-            return `${minutes}min`;
-        }
-        
-        // Auto-refresh active spots every 30 seconds
-        setInterval(() => {
-            if (window.currentUser && document.getElementById('spots').classList.contains('active')) {
-                loadActiveSpots();
-            }
-        }, 30000);
+        });
     </script>
 </body>
 </html>
